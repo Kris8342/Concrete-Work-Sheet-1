@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Concrete Job Form</title>
+
+    <style>
+        body            {font-family:Arial,sans-serif;margin:20px;line-height:1.6}
+        .form-container {max-width:900px;margin:0 auto;padding:20px;
+                         border:1px solid #ccc;border-radius:5px;background:#f9f9f9}
+        .header         {display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap}
+        .input-group    {margin-bottom:15px;display:flex;align-items:center;flex-wrap:wrap}
+        .input-field    {border:none;border-bottom:1px solid #333;background:transparent;
+                         padding:5px;width:200px;font-size:16px}
+        label           {font-weight:bold;margin-right:6px}
+        .section-title  {font-size:18px;font-weight:bold;margin-top:20px;margin-bottom:10px;
+                         border-bottom:2px solid #333;padding-bottom:5px}
+        .subsection-title{font-size:16px;font-weight:bold;margin-top:15px;margin-bottom:8px;color:#444}
+        table           {width:100%;border-collapse:collapse;margin-bottom:15px}
+        th,td           {border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}
+        th              {background:#f2f2f2;font-weight:bold}
+        .checkbox-group {display:flex;flex-wrap:wrap;gap:15px;margin-bottom:15px}
+        .checkbox-item  {display:flex;align-items:center;gap:5px}
+        input[type=checkbox]{width:18px;height:18px}
+        input[type=number]{width:100%}
+        .print-button,.add-section-button
+                       {padding:8px 15px;border:none;border-radius:4px;cursor:pointer;
+                        font-size:14px;color:#fff;margin:10px 10px 0 0}
+        .print-button         {background:#4CAF50}.print-button:hover {background:#45a049}
+        .add-section-button   {background:#2196F3}.add-section-button:hover{background:#0b7dda}
+        .section        {border:1px solid #ddd;padding:15px;margin-bottom:20px;border-radius:5px;background:#fff}
+        .remove-section {background:#f44336;color:#fff;border:none;border-radius:4px;
+                         padding:5px 10px;float:right;cursor:pointer}
+        textarea        {width:100%;height:80px;border:1px solid #ddd;padding:8px;font-family:Arial,sans-serif}
+        .counter-group  {display:flex;gap:6px}
+        .counter-group input{width:70px}
+        #lumber-notes   {height:100px;width:100%}
+        @media print {.no-print{display:none}body{margin:0}.form-container{border:none;padding:0}}
+    </style>
+</head>
+<body>
+<div class="form-container" id="form-root">
+
+    <!-- ---------------------------------------------------- HEADER -->
+    <div class="header">
+        <div class="input-group"><label for="name">Name:</label><input id="name"  class="input-field" type="text"></div>
+        <div class="input-group"><label for="date">Date Poured:</label><input id="date" class="input-field" type="text"></div>
+        <div class="input-group" style="flex:1 1 100%;"><label for="address">Job Address:</label><input id="address" class="input-field" type="text" style="width:400px;"></div>
+        <div class="input-group" style="flex:1 1 100%;"><label for="customer">Customer:</label><input id="customer" class="input-field" type="text" style="width:400px;"></div>
+    </div>
+
+    <!-- --------------------------------------------- FOOTING SECTIONS -->
+    <div id="sections-container">
+        <div class="section" id="section-1">
+            <button class="remove-section no-print" onclick="removeSection(this.parentNode)">Remove</button>
+            <div class="section-title">Footing Section&nbsp;1</div>
+
+            <!-- Length / Width / Depth -->
+            <table>
+                <tr>
+                    <th>Length&nbsp;(ft)</th><th>Width&nbsp;(in)</th><th>Depth&nbsp;(in)</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="counter-group">
+                            <input  type="number" step="100" min="0" placeholder="100s">
+                        </div>
+                    </td>
+                    <td><input type="number" step="6" min="0"></td>
+                    <td><input type="number" step="6" min="0"></td>
+                </tr>
+            </table>
+
+            <!-- Uprights -->
+            <table>
+                <tr><th colspan="2">Uprights</th><th>Length&nbsp;(ft)</th></tr>
+                <tr>
+                    <td style="width:120px;">Quantity</td>
+                    <td><input type="number" step="5" min="0"></td>
+                    <td><input type="number" step="1" min="0"></td>
+                </tr>
+            </table>
+
+            <!-- Crossbars -->
+            <table>
+                <tr><th colspan="2">Crossbars</th><th>Length&nbsp;(ft)</th></tr>
+                <tr>
+                    <td style="width:120px;">Quantity</td>
+                    <td><input type="number" step="5" min="0"></td>
+                    <td><input type="number" step="1" min="0"></td>
+                </tr>
+            </table>
+
+            <!-- Single / Double Mat -->
+            <div class="checkbox-group">
+                <div class="checkbox-item"><input id="single-mat-1" type="checkbox"><label for="single-mat-1" style="width:auto;">Single Mat</label></div>
+                <div class="checkbox-item"><input id="double-mat-1" type="checkbox"><label for="double-mat-1" style="width:auto;">Double Mat</label></div>
+            </div>
+
+            <!-- Rebar -->
+            <table>
+                <tr><th>Rebar&nbsp;Quantity</th><th>Size</th></tr>
+                <tr>
+                    <td>
+                        <div class="counter-group">
+                            <input type="number" step="10" min="0" placeholder="10s">
+                        </div>
+                    </td>
+                    <td>
+                        <select>
+                            <option>#4</option><option>#5</option><option>#6</option>
+                            <option>#7</option><option>#8</option><option>#9</option><option>#10</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Bulkheads -->
+            <table>
+                <tr><th>Bulkheads</th><th>Quantity</th><th>Height</th></tr>
+                <tr><td></td><td><input type="number" step="1"  min="0"></td><td><input type="number" step="0.01" min="0"></td></tr>
+            </table>
+
+            <!-- Piers -->
+            <table>
+                <tr><th>Piers&nbsp;Quantity</th><th>Size</th><th>Custom</th></tr>
+                <tr>
+                    <td><input type="number" step="1" min="0"></td>
+                    <td>
+                        <select id="piersize-1" onchange="toggleCustomSize(this)">
+                            <option>2' x 2' x 12"</option>
+                            <option>3' x 3' x 12"</option>
+                        </select>
+                    </td>
+                    <td class="checkbox-item">
+                        <input type="checkbox" id="piercustom-1" onchange="enableCustomInput(this)">
+                        <label for="piercustom-1" style="width:auto;">Custom&nbsp;Size</label>
+                        <input type="text" id="piercustominput-1" disabled style="width:120px;">
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Fireplace & Porch Pad -->
+            <div class="subsection-title">Fireplace</div>
+            <input type="text" style="width:100%;margin-bottom:10px;">
+
+            <div class="subsection-title">Porch Pad</div>
+            <input type="text" style="width:100%;margin-bottom:10px;">
+
+            <!-- Additional Materials -->
+            <div class="subsection-title">Additional Materials</div>
+            <table>
+                <tr><th>Item</th><th>Quantity</th><th>Notes</th></tr>
+                <tr>
+                    <td><input value="Rebar Cut at 2' for bulkheads" type="text"></td>
+                    <td><input type="number" step="2" min="0"></td>
+                    <td><input type="text"></td>
+                </tr>
+                <tr><td><input type="text"></td><td><input type="number" step="1" min="0"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="number" step="1" min="0"></td><td><input type="text"></td></tr>
+            </table>
+
+            <!-- Notes -->
+            <div class="subsection-title">Notes for this Section</div>
+            <textarea></textarea>
+        </div>
+    </div>
+    <button class="add-section-button no-print" onclick="addSection()">Add Another Section</button>
+
+    <!-- -------------------------------------- SECTION COUNT CHECKBOXES -->
+    <div class="section-title">Number of Sections:</div>
+    <div class="checkbox-group">
+        <script>for(let i=1;i<=10;i++){document.write(`<div class="checkbox-item"><input id="section-count-${i}" name="section-count" type="checkbox" onclick="updateSectionCount(${i})"><label for="section-count-${i}" style="width:auto;">${i}</label></div>`);} </script>
+    </div>
+
+    <!-- ---------------------------------------- CONCRETE INFORMATION -->
+    <div class="section-title">Concrete Information</div>
+    <div class="checkbox-group">
+        <div class="checkbox-item"><input id="imi" name="concrete-company" type="checkbox" onclick="updateConcreteCompany('imi')"><label for="imi" style="width:auto;">IMI</label></div>
+        <div class="checkbox-item"><input id="srm" name="concrete-company" type="checkbox" onclick="updateConcreteCompany('srm')"><label for="srm" style="width:auto;">SRM</label></div>
+        <div class="input-group" style="margin-left:20px;flex-grow:1;"><label for="other-company" style="width:auto;">Other:</label><input id="other-company" class="input-field" type="text" oninput="updateConcreteCompany('other')"></div>
+    </div>
+
+    <!-- Yards poured -->
+    <table style="margin-bottom:15px;">
+        <tr><th>Yards&nbsp;Poured</th></tr>
+        <tr>
+            <td>
+                <div class="counter-group">
+                    <input id="yards-tens" type="number" step="10" min="0" placeholder="10s">
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Additives & Strength -->
+    <table>
+        <tr><th>Additives</th><th>Strength&nbsp;(psi)</th></tr>
+        <tr>
+            <td><input id="additives" class="input-field" type="text" style="width:100%"></td>
+            <td><input id="strength"  type="number" step="500" min="3000" value="3000"></td>
+        </tr>
+    </table>
+
+    <!-- ---------------------------------------------------- PUMP CO. -->
+    <div class="section-title">Pump Co.</div>
+    <div class="checkbox-group">
+        <div class="checkbox-item"><input id="pump-cpp"      name="pump-company" type="checkbox" onclick="updatePumpCompany('cpp')"><label for="pump-cpp"      style="width:auto;">CPP</label></div>
+        <div class="checkbox-item"><input id="pump-brundage" name="pump-company" type="checkbox" onclick="updatePumpCompany('brundage')"><label for="pump-brundage" style="width:auto;">Brundage</label></div>
+        <div class="input-group" style="margin-left:20px;flex-grow:1;"><label for="pump-other" style="width:auto;">Other:</label><input id="pump-other" class="input-field" type="text" oninput="updatePumpCompany('other')"></div>
+    </div>
+
+    <!-- --------------------------------------------------- CREW INFO -->
+    <div class="section-title">Crew Information</div>
+    <table id="crew-table">
+        <tr><th>Name</th><th>Role</th><th>Hours</th></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="number" step="0.5"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="number" step="0.5"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="number" step="0.5"></td></tr>
+    </table>
+    <button class="add-section-button no-print" onclick="addCrewMember()">Add Crew Member</button>
+
+    <!-- ------------------------------------------ EQUIPMENT (dynamic) -->
+    <div class="section-title">Equipment Used</div>
+    <table id="equipment-table">
+        <tr><th>Equipment</th><th>Hours</th><th>Notes</th></tr>
+        <tr><td><input type="text"></td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+    </table>
+    <button class="add-section-button no-print" onclick="addEquipmentRow()">Add Equipment</button>
+
+    <!-- ---------------------------------- FIXED EQUIPMENT HRS / DESC -->
+    <div class="section-title">Equipment Hours &amp; Description</div>
+    <table>
+        <tr><th>Equipment</th><th>Hours</th><th>Description</th></tr>
+        <tr><td>MiniX</td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+        <tr><td>Hammer</td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+        <tr><td>Skid / Dingo</td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+        <tr><td>Step Pad</td><td><input type="number" step="0.5"></td><td><input type="text"></td></tr>
+    </table>
+
+    <!-- ------------------------------------------------ SUPPLIES USED -->
+    <div class="section-title">Supplies Used</div>
+    <table>
+        <tr><th>Supply</th><th>Quantity / Notes</th></tr>
+        <tr>
+            <td>Paint</td>
+            <td>
+                Boxes&nbsp;<input type="number" step="1" min="0" style="width:60px;">
+                &nbsp;Cans&nbsp;<input  type="number" step="1" min="0" style="width:60px;">
+            </td>
+        </tr>
+        <tr><td>Chairs&nbsp;(boxes)</td><td><input type="number" step="1" min="0"></td></tr>
+        <tr><td>Grade Pins&nbsp;(boxes)</td><td><input type="number" step="1" min="0"></td></tr>
+        <tr><td>2&nbsp;x&nbsp;4&nbsp;x&nbsp;16'</td><td><input type="number" step="1" min="0"></td></tr>
+        <tr><td>Plywood&nbsp;(sheets)</td><td><input type="number" step="1" min="0"></td></tr>
+        <tr><td>Lumber&nbsp;Notes</td><td><textarea id="lumber-notes"></textarea></td></tr>
+    </table>
+
+    <!-- ------------------------------------ MANAGEMENT JOB CODING -->
+    <div class="section-title">Management Job Coding</div>
+    <div class="input-group"><label for="builder">Builder:</label><input id="builder" class="input-field" type="text"></div>
+    <div class="input-group"><label for="city-county">City/County:</label><input id="city-county" class="input-field" type="text"></div>
+    <div class="checkbox-group">
+        <div class="checkbox-item"><input id="job-turnkey"  type="checkbox"><label for="job-turnkey"  style="width:auto;">Turnkey</label></div>
+        <div class="checkbox-item"><input id="job-house"    type="checkbox"><label for="job-house"    style="width:auto;">House</label></div>
+        <div class="checkbox-item"><input id="job-labor"    type="checkbox"><label for="job-labor"    style="width:auto;">Labor Only</label></div>
+        <div class="checkbox-item"><input id="job-retaining"type="checkbox"><label for="job-retaining"style="width:auto;">Retaining Wall</label></div>
+    </div>
+
+    <!-- ------------------------------------------------ ADDITIONAL NOTES -->
+    <div class="section-title">Additional Notes</div>
+    <textarea id="additional-notes"></textarea>
+
+    <!-- ------------------------------------------------ BUTTON -->
+    <button class="print-button no-print" onclick="window.print()">Print Form</button>
+
+    <!-- ------------------------------------------------ JAVASCRIPT -->
+    <script>
+        /* Enter key = next field */
+        document.addEventListener('keydown',e=>{
+            if(e.key==='Enter'){
+                e.preventDefault();
+                const inputs=[...document.querySelectorAll('input:not([type=checkbox]),textarea,select')];
+                const idx=inputs.indexOf(document.activeElement);
+                (inputs[idx+1]||inputs[0]).focus();
+            }
+        });
+
+        /* set today's date */
+        window.addEventListener('DOMContentLoaded',()=>document.getElementById('date').value=new Date().toLocaleDateString());
+
+        /* ---------- Dynamic Footing Sections ---------- */
+        let sectionCount=1;
+        function addSection(){
+            sectionCount++;
+            const template=document.getElementById('section-1').cloneNode(true);
+            template.id='section-'+sectionCount;
+            template.querySelector('.section-title').innerHTML='Footing Section&nbsp;'+sectionCount;
+
+            /* refresh IDs inside the clone (single/double mat + pier custom) */
+            const sm=template.querySelector('[id^="single-mat-"]');
+            const dm=template.querySelector('[id^="double-mat-"]');
+            const pc=template.querySelector('[id^="piercustom-"]');
+            const pci=template.querySelector('[id^="piercustominput-"]');
+            const ps=template.querySelector('[id^="piersize-"]');
+            sm.id='single-mat-'+sectionCount;template.querySelector('label[for^="single-mat-"]').htmlFor=sm.id;sm.checked=false;
+            dm.id='double-mat-'+sectionCount;template.querySelector('label[for^="double-mat-"]').htmlFor=dm.id;dm.checked=false;
+            pc.id='piercustom-'+sectionCount;template.querySelector('label[for^="piercustom-"]').htmlFor=pc.id;pc.checked=false;
+            pci.id='piercustominput-'+sectionCount;pci.value='';pci.disabled=true;
+            ps.id='piersize-'+sectionCount;ps.selectedIndex=0;
+
+            /* clear all other user inputs */
+            template.querySelectorAll('input').forEach(inp=>{
+                if(inp.type==='checkbox') {inp.checked=false;}
+                else if(inp.type==='number'||inp.type==='text') {inp.value='';}
+            });
+            template.querySelectorAll('textarea').forEach(t=>t.value='');
+            document.getElementById('sections-container').appendChild(template);
+            const cb=document.getElementById('section-count-'+sectionCount);
+            if(cb){cb.checked=true;updateSectionCount(sectionCount);}
+        }
+        function removeSection(el){
+            const sections=[...document.querySelectorAll('#sections-container .section')];
+            if(sections.length>1){el.remove();renumberSections();}
+            else alert('At least one section is required.');
+        }
+        function renumberSections(){
+            const sections=[...document.querySelectorAll('#sections-container .section')];
+            sections.forEach((sec,i)=>{
+                const n=i+1;
+                sec.id='section-'+n;
+                sec.querySelector('.section-title').innerHTML='Footing Section&nbsp;'+n;
+                const sm=sec.querySelector('[id^="single-mat-"]');
+                const dm=sec.querySelector('[id^="double-mat-"]');
+                const pc=sec.querySelector('[id^="piercustom-"]');
+                const pci=sec.querySelector('[id^="piercustominput-"]');
+                const ps=sec.querySelector('[id^="piersize-"]');
+                sm.id='single-mat-'+n;sec.querySelector('label[for^="single-mat-"]').htmlFor=sm.id;
+                dm.id='double-mat-'+n;sec.querySelector('label[for^="double-mat-"]').htmlFor=dm.id;
+                pc.id='piercustom-'+n;sec.querySelector('label[for^="piercustom-"]').htmlFor=pc.id;
+                pci.id='piercustominput-'+n;
+                ps.id='piersize-'+n;
+            });
+            sectionCount=sections.length;
+        }
+        function updateSectionCount(cnt){
+            [...document.querySelectorAll('input[name="section-count"]')].forEach(b=>b.checked=false);
+            document.getElementById('section-count-'+cnt).checked=true;
+            const current=[...document.querySelectorAll('#sections-container .section')].length;
+            if(cnt>current){for(let i=current;i<cnt;i++)addSection();}
+            else if(cnt<current){
+                const secs=[...document.querySelectorAll('#sections-container .section')];
+                for(let i=current-1;i>=cnt;i--)secs[i].remove();
+                renumberSections();
+            }
+        }
+
+        /* ---------- toggle custom pier size ---------- */
+        function enableCustomInput(cb){
+            const num=cb.id.split('-')[1];
+            const inp=document.getElementById('piercustominput-'+num);
+            inp.disabled=!cb.checked;
+            if(!cb.checked) inp.value='';
+        }
+        function toggleCustomSize(sel){
+            const num=sel.id.split('-')[1];
+            const cb=document.getElementById('piercustom-'+num);
+            const inp=document.getElementById('piercustominput-'+num);
+            cb.checked=false;inp.disabled=true;inp.value='';
+        }
+
+        /* ---------- single-select helpers ---------- */
+        function updateConcreteCompany(c){
+            [...document.querySelectorAll('input[name="concrete-company"]')].forEach(b=>b.checked=false);
+            if(c==='imi'||c==='srm'){document.getElementById(c).checked=true;document.getElementById('other-company').value='';}
+        }
+        function updatePumpCompany(c){
+            [...document.querySelectorAll('input[name="pump-company"]')].forEach(b=>b.checked=false);
+            if(c==='cpp'||c==='brundage'){document.getElementById('pump-'+c).checked=true;document.getElementById('pump-other').value='';}
+        }
+
+        /* ---------- add rows to Crew / Equipment ---------- */
+        function addCrewMember(){
+            const r=document.getElementById('crew-table').insertRow(-1);
+            r.innerHTML='<td><input type="text"></td><td><input type="text"></td><td><input type="number" step="0.5"></td>';
+        }
+        function addEquipmentRow(){
+            const r=document.getElementById('equipment-table').insertRow(-1);
+            r.innerHTML='<td><input type="text"></td><td><input type="number" step="0.5"></td><td><input type="text"></td>';
+        }
+    </script>
+
+</div>
+</body>
+</html>
