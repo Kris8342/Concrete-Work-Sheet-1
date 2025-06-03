@@ -17,7 +17,8 @@
       background-color: #f5f7fa;
       color: #2d3748;
       line-height: 1.5;
-      padding: 20px;
+      padding: 10px;
+      font-size: 12px;
     }
     
     .container {
@@ -32,72 +33,67 @@
     .form-header {
       background: #2c5282;
       color: white;
-      padding: 15px 20px;
+      padding: 5px 10px;
       text-align: center;
     }
     
     .form-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       margin: 5px 0;
     }
     
-    .form-subtitle {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    
     .form-container {
-      padding: 20px;
+      padding: 8px;
     }
     
     .form-section {
-      margin-bottom: 25px;
-      padding-bottom: 15px;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
       border-bottom: 1px solid #e2e8f0;
     }
     
     .section-title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: #2c5282;
-      margin-bottom: 15px;
-      padding-bottom: 6px;
+      margin: 0 0 4px 0;
+      padding-bottom: 4px;
       border-bottom: 2px solid #cbd5e0;
     }
     
     .grid-2 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-      margin-bottom: 15px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
     
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 15px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
     
     .input-group {
-      margin-bottom: 12px;
+      margin-bottom: 4px;
     }
     
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
       font-weight: 600;
       color: #4a5568;
-      font-size: 14px;
+      font-size: 12px;
     }
     
     input, select, textarea {
       width: 100%;
-      padding: 10px 12px;
+      padding: 6px 8px;
       border: 1px solid #cbd5e0;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 12px;
       transition: all 0.2s ease;
       background-color: #f8fafc;
     }
@@ -110,36 +106,37 @@
     }
     
     textarea {
-      min-height: 120px;
+      min-height: 80px;
       resize: vertical;
     }
     
     .large-textarea {
-      min-height: 150px;
+      min-height: 100px;
     }
     
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 15px 0;
+      margin: 6px 0;
       background: white;
       border-radius: 6px;
       overflow: hidden;
+      font-size: 12px;
     }
     
     th {
       background-color: #2c5282;
       color: white;
       font-weight: 500;
-      padding: 10px 12px;
+      padding: 6px 8px;
       text-align: left;
-      font-size: 14px;
+      font-size: 12px;
     }
     
     td {
-      padding: 10px 12px;
+      padding: 6px 8px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 14px;
+      font-size: 12px;
     }
     
     tr:last-child td {
@@ -153,14 +150,15 @@
     .checkbox-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin: 12px 0;
+      gap: 8px;
+      margin: 6px 0;
     }
     
     .checkbox-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      font-size: 12px;
     }
     
     .checkbox-item input {
@@ -168,10 +166,10 @@
     }
     
     .btn {
-      padding: 10px 20px;
+      padding: 6px 10px;
       border: none;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -184,7 +182,6 @@
     
     .btn-primary:hover {
       background: #2c5282;
-      transform: translateY(-1px);
     }
     
     .btn-danger {
@@ -198,29 +195,29 @@
     
     .btn-group {
       display: flex;
-      gap: 12px;
-      margin-top: 15px;
+      gap: 6px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
     
     .section {
       background: white;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
     }
     
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
     }
     
     .section-number {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       color: #2c5282;
     }
     
@@ -228,17 +225,18 @@
       display: inline-block;
     }
     
-    .footer {
-      text-align: center;
-      padding: 15px;
-      color: #718096;
-      font-size: 13px;
-      border-top: 1px solid #e2e8f0;
-      margin-top: 20px;
-    }
-    
     .full-width {
       grid-column: 1 / -1;
+    }
+    
+    .counter-group {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    
+    .counter-group input {
+      width: 60px;
     }
     
     /* Print styles */
@@ -246,6 +244,8 @@
       body {
         padding: 0;
         background: white;
+        font-size: 10px;
+        line-height: 1.2;
       }
       
       .no-print {
@@ -256,46 +256,57 @@
         max-width: 100%;
         box-shadow: none;
         border-radius: 0;
+        margin: 0;
+        padding: 0;
       }
       
       .form-container {
-        padding: 10px;
+        padding: 5px !important;
       }
       
       .section-title {
-        font-size: 16px;
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
       }
       
       .grid-2, .grid-3 {
         display: block;
+        margin-bottom: 4px !important;
       }
       
       .input-group {
-        margin-bottom: 8px;
+        margin-bottom: 3px !important;
       }
       
       table {
-        font-size: 12px;
+        font-size: 10px !important;
+        margin: 4px 0 !important;
       }
       
       th, td {
-        padding: 8px 10px;
+        padding: 4px 5px !important;
       }
       
       textarea {
-        min-height: 100px;
+        min-height: 60px !important;
+      }
+      
+      .section {
+        padding: 6px !important;
+        margin-bottom: 6px !important;
+        page-break-inside: avoid;
       }
     }
     
     /* Mobile optimizations */
     @media (max-width: 768px) {
       .form-container {
-        padding: 15px;
+        padding: 8px;
       }
       
       .grid-2, .grid-3 {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 6px;
       }
       
       .btn {
@@ -312,7 +323,6 @@
   <div class="container" id="form-root">
     <div class="form-header">
       <div class="form-title">Concrete Job Documentation</div>
-      <div class="form-subtitle">Complete all sections for accurate records</div>
     </div>
     
     <div class="form-container">
@@ -328,7 +338,7 @@
           
           <div class="input-group">
             <label for="date">Date Poured / Fecha Vaciado</label>
-            <input type="text" id="date" value="">
+            <input type="text" id="date">
           </div>
           
           <div class="input-group full-width">
@@ -373,7 +383,7 @@
               </div>
             </div>
             
-            <h3 class="section-title" style="font-size: 16px;">Uprights / Verticales</h3>
+            <h3 class="section-title" style="font-size: 13px;">Uprights / Verticales</h3>
             <div class="grid-3">
               <div class="input-group">
                 <label>Quantity / Cantidad</label>
@@ -386,7 +396,7 @@
               </div>
             </div>
             
-            <h3 class="section-title" style="font-size: 16px;">Crossbars / Travesaños</h3>
+            <h3 class="section-title" style="font-size: 13px;">Crossbars / Travesaños</h3>
             <div class="grid-3">
               <div class="input-group">
                 <label>Quantity / Cantidad</label>
@@ -399,7 +409,7 @@
               </div>
             </div>
             
-            <h3 class="section-title" style="font-size: 16px;">Mat Type</h3>
+            <h3 class="section-title" style="font-size: 13px;">Mat Type</h3>
             <div class="checkbox-group">
               <div class="checkbox-item">
                 <input type="checkbox" id="single-mat-1">
@@ -411,7 +421,7 @@
               </div>
             </div>
             
-            <h3 class="section-title" style="font-size: 16px;">Rebar Details</h3>
+            <h3 class="section-title" style="font-size: 13px;">Rebar Details</h3>
             <div class="grid-3">
               <div class="input-group">
                 <label>Rebar Qty / Cant. Varilla</label>
@@ -432,7 +442,36 @@
               </div>
             </div>
             
-            <h3 class="section-title" style="font-size: 16px;">Additional Elements</h3>
+            <h3 class="section-title" style="font-size: 13px;">Bulkheads / Mamparos</h3>
+            <div class="grid-3">
+              <div class="input-group">
+                <label>Qty / Cantidad</label>
+                <input type="number" step="1" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Height / Altura</label>
+                <input type="number" step="0.01" min="0">
+              </div>
+            </div>
+            
+            <h3 class="section-title" style="font-size: 13px;">Piers / Pilares</h3>
+            <div class="grid-3">
+              <div class="input-group">
+                <label>Qty / Cantidad</label>
+                <input type="number" step="1" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Size / Tamaño</label>
+                <select>
+                  <option>2' x 2' x 12"</option>
+                  <option>3' x 3' x 12"</option>
+                </select>
+              </div>
+            </div>
+            
+            <h3 class="section-title" style="font-size: 13px;">Additional Elements</h3>
             <div class="grid-2">
               <div class="input-group">
                 <label>Fireplace / Chimenea</label>
@@ -640,6 +679,85 @@
         </div>
       </div>
       
+      <!-- Materials & Lumber -->
+      <div class="form-section">
+        <h2 class="section-title">Materials & Lumber</h2>
+        
+        <table>
+          <tr>
+            <th>Supply / Suministro</th>
+            <th>Quantity / Cantidad</th>
+          </tr>
+          <tr>
+            <td>Paint / Pintura</td>
+            <td>
+              <div class="counter-group">
+                <span>Boxes/Cajas:</span>
+                <input type="number" min="0">
+                <span>Cans/Latas:</span>
+                <input type="number" min="0">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Chairs (boxes) / Sillas (cajas)</td>
+            <td><input type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>Grade Pins (boxes) / Pines (cajas)</td>
+            <td><input type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>2 × 4 × 16'</td>
+            <td><input type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>Plywood (sheets) / Contrachapado</td>
+            <td><input type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>Lumber Notes / Notas de Madera</td>
+            <td><textarea style="height:80px"></textarea></td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Management Job Coding -->
+      <div class="form-section">
+        <h2 class="section-title">Management Job Coding</h2>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Builder / Constructor</label>
+            <input type="text">
+          </div>
+          
+          <div class="input-group">
+            <label>City/County / Ciudad</label>
+            <input type="text">
+          </div>
+        </div>
+        
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox">
+            <label>Turnkey / Llave Mano</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox">
+            <label>House / Casa</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox">
+            <label>Labor Only / Solo O.</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox">
+            <label>Retaining Wall / Muro</label>
+          </div>
+        </div>
+      </div>
+      
       <!-- Final Notes -->
       <div class="form-section">
         <h2 class="section-title">Final Notes</h2>
@@ -663,39 +781,37 @@
         </button>
       </div>
     </div>
-    
-    <footer class="footer">
-      Concrete Job Form | © 2023 Construction Documentation
-    </footer>
   </div>
 
   <script>
     // Set today's date
-    document.getElementById('date').value = new Date().toLocaleDateString();
-    
-    // Handle concrete company selection
-    document.getElementById('concrete-company').addEventListener('change', function() {
-      const otherField = document.getElementById('other-company');
-      otherField.disabled = this.value !== 'other';
-      if (this.value !== 'other') otherField.value = '';
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('date').value = new Date().toLocaleDateString();
+      
+      // Handle concrete company selection
+      document.getElementById('concrete-company').addEventListener('change', function() {
+        const otherField = document.getElementById('other-company');
+        otherField.disabled = this.value !== 'other';
+        if (this.value !== 'other') otherField.value = '';
+      });
     });
     
-    // Optimized Save as PDF function
+    // Optimized PDF saving function
     function savePDF() {
       // Hide non-printable elements
       const noPrintElements = document.querySelectorAll('.no-print');
       noPrintElements.forEach(el => el.style.display = 'none');
-      
+
       const element = document.getElementById('form-root');
       
       // Create a clone to preserve original styles
       const clone = element.cloneNode(true);
       clone.style.width = '100%';
+      clone.style.overflow = 'visible';
       document.body.appendChild(clone);
       
-      // Optimized PDF settings for compact output
       const opt = {
-        margin: 0.5,
+        margin: 0.3,
         filename: 'concrete_job_form.pdf',
         pagebreak: { mode: ['avoid-all', 'css'], before: '.form-section' },
         html2canvas: {
@@ -708,7 +824,7 @@
           unit: 'in', 
           format: 'letter', 
           orientation: 'portrait',
-          hotfixes: ['px_scaling']
+          hotfixes: ['px_scaling']  // Fixes pixel scaling issues
         }
       };
 
