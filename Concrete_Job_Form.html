@@ -577,64 +577,79 @@
     }
 
     // Fixed PDF saving function with improved cleanup and error handling
-    function savePDF() {
-      // Hide non-printable elements
-      const ui = document.querySelectorAll('.no-print');
-      ui.forEach((el) => (el.style.display = 'none'));
-      
-      const element = document.getElementById('form-root');
-      
-      // Create a clone to preserve original styles
-      const clone = element.cloneNode(true);
-      clone.style.width = '100%';
-      clone.style.overflow = 'visible';
-      document.body.appendChild(clone);
-      
-      // Compress spacing for clone
-      clone.querySelectorAll('*').forEach(el => {
-        el.style.marginBottom = '2px';
-        el.style.padding = '2px';
-        el.style.lineHeight = '1.1';
-        el.style.fontSize = '9px';
-      });
+function savePDF() {
+  // Hide non-printable elements
+  const ui = document.querySelectorAll('.no-print');
+  ui.forEach((el) => (el.style.display = 'none'));
 
-      const opt = {
-        margin: 0.2,
-        filename: 'concrete_job_form.pdf',
-        pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
-        html2canvas: {
-          scale: 1.5,
-          useCORS: true,
-          scrollY: 0,
-          windowHeight: clone.scrollHeight
-        },
-        jsPDF: { 
-          unit: 'in', 
-          format: 'letter', 
-          orientation: 'portrait',
-          hotfixes: ['px_scaling']  // Fixes pixel scaling issues
-        }
-      };
+  const element = document.getElementById('form-root');
 
-      // Generate PDF
-      html2pdf()
-        .set(opt)
-        .from(clone)
-        .save()
-        .then(() => {
-          // Clean up and restore UI
-          document.body.removeChild(clone);
-          ui.forEach((el) => (el.style.display = ''));
-        })
-        .catch(err => {
-          console.error('PDF generation failed:', err);
-          if (document.body.contains(clone)) {
-            document.body.removeChild(clone);
-          }
-          ui.forEach((el) => (el.style.display = ''));
-          alert('Failed to generate PDF. Please try again.');
-        });
+  // Clone the element to preserve original styles
+  const clone = element.cloneNode(true);
+  clone.style.width = '100%';
+  clone.style.overflow = 'visible';
+  document.body.appendChild(clone);
+
+  // Inject print-safe styles to the clone
+  const style = document.createElement('style');
+  style.textContent = `
+    input, select, textarea {
+      background-color: #fff !important;
+      color: #000 !important;
+      border: 1px solid #ccc !important;
+      box-shadow: none !important;
     }
+    .input-field {
+      background-color: #fff !important;
+      border: 1px solid #ccc !important;
+    }
+    * {
+      margin-bottom: 2px !important;
+      padding: 2px !important;
+      line-height: 1.1 !important;
+      font-size: 9px !important;
+    }
+  `;
+  clone.appendChild(style);
+
+  const opt = {
+    margin: 0.2,
+    filename: 'concrete_job_form.pdf',
+    pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
+    html2canvas: {
+      scale: 2, // Higher scale for better quality
+      useCORS: true,
+      scrollY: 0,
+      windowHeight: clone.scrollHeight
+    },
+    jsPDF: {
+      unit: 'in',
+      format: 'letter',
+      orientation: 'portrait',
+      hotfixes: ['px_scaling'] // Fixes pixel scaling issues
+    }
+  };
+
+  // Generate PDF
+  html2pdf()
+    .set(opt)
+    .from(clone)
+    .save()
+    .then(() => {
+      // Clean up and restore UI
+      document.body.removeChild(clone);
+      ui.forEach((el) => (el.style.display = ''));
+    })
+    .catch(err => {
+      console.error('PDF generation failed:', err);
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
+      }
+      ui.forEach((el) => (el.style.display = ''));
+      alert('Failed to generate PDF. Please try again.');
+    });
+}
+
 
     // Dynamic Sections
     let sectionCount = 1;
