@@ -4,177 +4,296 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Concrete Job Form</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    /* ===== SCREEN STYLES ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      margin: 15px;
-      line-height: 1.5;
+      background-color: #f0f4f8;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #1a3a5f, #2c5282);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .logo i {
+      font-size: 32px;
+    }
+    
+    .form-title {
+      font-size: 22px;
+      font-weight: 500;
+      margin-top: 10px;
+      opacity: 0.9;
     }
     
     .form-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 15px;
-      background: #f9f9f9;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 25px;
     }
     
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 10px; /* Reduced from 18px */
-    }
-    
-    .input-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 15px;
-      flex: 1 1 200px;
-    }
-    
-    label {
-      font-weight: bold;
-      min-width: max-content;
-    }
-    
-    .input-field {
-      border: none;
-      border-bottom: 1px solid #333;
-      padding: 4px;
-      font-size: 15px;
-      flex: 1;
+    .form-section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
     }
     
     .section-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 15px 0 8px; /* Reduced top margin */
-      border-bottom: 2px solid #333;
-      padding-bottom: 4px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c5282;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #cbd5e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
-    .subsection-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin: 12px 0 6px; /* Reduced margins */
+    .section-title i {
+      font-size: 24px;
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 15px;
+    }
+    
+    .dual-label {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background-color: #f8fafc;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+      background-color: white;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
     
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 12px; /* Reduced */
-      font-size: 14px;
-      table-layout: fixed;
-    }
-    
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-      vertical-align: top;
-      word-break: break-word;
+      margin: 20px 0;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
     th {
-      background: #f2f2f2;
-      font-weight: bold;
+      background-color: #2c5282;
+      color: white;
+      font-weight: 500;
+      padding: 12px 15px;
+      text-align: left;
+    }
+    
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f8fafc;
     }
     
     .checkbox-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 10px; /* Reduced */
+      gap: 15px;
+      margin: 15px 0;
     }
     
     .checkbox-item {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 14px;
+      gap: 8px;
     }
     
-    .section {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 12px; /* Reduced */
-      margin-bottom: 15px; /* Reduced */
-      border-radius: 5px;
-      page-break-inside: avoid;
-    }
-    
-    .remove-section {
-      background: #f44336;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
-      float: right;
-      font-size: 13px;
-    }
-    
-    textarea {
-      width: 100%;
-      height: 80px;
-      border: 1px solid #ddd;
-      padding: 8px;
-      resize: vertical;
-      box-sizing: border-box;
-    }
-    
-    .counter-group {
-      display: flex;
-      gap: 6px;
-    }
-    
-    select.hour-select {
-      width: 100%;
-      font-size: 14px;
-      padding: 4px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    .checkbox-item input {
+      width: auto;
     }
     
     .btn {
-      padding: 8px 15px;
+      padding: 12px 25px;
       border: none;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      margin: 10px 10px 0 0;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     
-    .btn-green {
-      background: #4caf50;
+    .btn i {
+      font-size: 18px;
     }
     
-    .btn-blue {
-      background: #2196f3;
+    .btn-primary {
+      background: linear-gradient(135deg, #2b6cb0, #4299e1);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2c5282, #3182ce);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    }
+    
+    .btn-danger {
+      background: #e53e3e;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c53030;
+      transform: translateY(-2px);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .section {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .section-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c5282;
     }
     
     .no-print {
       display: inline-block;
     }
     
-    /* Mobile optimizations */
-    @media (max-width: 768px) {
-      .header {
-        flex-direction: column;
-        gap: 10px;
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+      font-size: 14px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 30px;
+    }
+    
+    /* Print styles */
+    @media print {
+      body {
+        padding: 0;
+        background: white;
+      }
+      
+      .no-print {
+        display: none !important;
+      }
+      
+      .container {
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      header {
+        padding: 15px;
+      }
+      
+      .form-container {
+        padding: 15px;
+      }
+      
+      .section-title {
+        font-size: 16px;
+      }
+      
+      .grid-2 {
+        display: block;
       }
       
       .input-group {
-        flex: 1 1 100%;
-      }
-      
-      .input-field {
-        width: 100%;
+        margin-bottom: 10px;
       }
       
       table {
@@ -182,517 +301,436 @@
       }
       
       th, td {
-        padding: 6px;
+        padding: 8px 10px;
+      }
+      
+      .btn-group {
+        display: none;
+      }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 15px;
+      }
+      
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
       
       .btn {
         width: 100%;
-        margin: 5px 0;
+        justify-content: center;
+      }
+      
+      .btn-group {
+        flex-direction: column;
       }
     }
-
-    /* ===== PRINT STYLES ===== */
-    @media print {
-      @page {
-        size: letter portrait;
-        margin: 0.25in; /* Reduced margin */
-      }
-      
-      html, body {
-        width: 100%;
-        height: auto;
-        margin: 0;
-        padding: 0;
-        font-size: 10px;
-        line-height: 1.2;
-      }
-      
-      .no-print, .remove-section {
-        display: none !important;
-      }
-      
-      .form-container {
-        border: none;
-        padding: 5px !important; /* Reduced */
-        margin: 0;
-        max-width: 100%;
-      }
-      
-      .header {
-        margin-bottom: 5px !important; /* Reduced */
-        gap: 5px !important;
-      }
-      
-      table {
-        font-size: 8px; /* Reduced */
-        margin-bottom: 3px; /* Reduced */
-      }
-      
-      th, td {
-        padding: 2px !important; /* Reduced */
-      }
-      
-      label, th, td, input, select, textarea {
-        font-size: 8px !important; /* Reduced */
-      }
-      
-      .section-title {
-        font-size: 10px !important; /* Reduced */
-        margin: 4px 0 3px !important; /* Reduced */
-        padding-bottom: 2px !important;
-      }
-      
-      .subsection-title {
-        font-size: 9px !important; /* Reduced */
-        margin: 3px 0 2px !important; /* Reduced */
-      }
-      
-      .input-group, .checkbox-group {
-        margin-bottom: 3px !important; /* Reduced */
-      }
-      
-      .section {
-        padding: 6px !important; /* Reduced */
-        margin-bottom: 8px !important; /* Reduced */
-      }
-      
-      textarea {
-        height: 40px !important; /* Reduced */
-      }
+    
+    /* Icons */
+    .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="form-container" id="form-root">
-    <!-- HEADER -->
-    <div class="header">
-      <div class="input-group">
-        <label for="name">Name / Nombre:</label>
-        <input id="name" class="input-field" type="text">
+  <div class="container" id="form-root">
+    <header>
+      <div class="logo">
+        <i>🏗️</i>
+        <span>CONCRETE PRO</span>
       </div>
-      
-      <div class="input-group">
-        <label for="date">Date Poured / Fecha Vaciado:</label>
-        <input id="date" class="input-field" type="text">
-      </div>
-      
-      <div class="input-group">
-        <label for="address">Job Address / Dirección del Trabajo:</label>
-        <input id="address" class="input-field" type="text">
-      </div>
-      
-      <div class="input-group">
-        <label for="customer">Customer / Cliente:</label>
-        <input id="customer" class="input-field" type="text">
-      </div>
-    </div>
-
-    <!-- FOOTING SECTIONS -->
-    <div id="sections-container">
-      <div class="section" id="section-1">
-        <button class="remove-section no-print" onclick="removeSection(this.parentNode)">Remove</button>
-        <div class="section-title">Footing Section / Sección de Cimentación 1</div>
-
-        <!-- Length / Width / Depth -->
-        <table>
-          <tr>
-            <th>Length (ft) / Largo (pies)</th>
-            <th>Width (in) / Ancho (pulg)</th>
-            <th>Depth (in) / Profundidad (pulg)</th>
-          </tr>
-          <tr>
-            <td><input type="number" step="100" min="0"></td>
-            <td><input type="number" step="6" min="0"></td>
-            <td><input type="number" step="6" min="0"></td>
-          </tr>
-        </table>
-
-        <!-- Uprights -->
-        <table>
-          <tr>
-            <th colspan="2">Uprights / Verticales</th>
-            <th>Length (ft) / Largo (pies)</th>
-          </tr>
-          <tr>
-            <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0"></td>
-            <td><input type="number" step="1" min="0"></td>
-          </tr>
-        </table>
-
-        <!-- Crossbars -->
-        <table>
-          <tr>
-            <th colspan="2">Crossbars / Travesaños</th>
-            <th>Length (ft) / Largo (pies)</th>
-          </tr>
-          <tr>
-            <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0"></td>
-            <td><input type="number" step="1" min="0"></td>
-          </tr>
-        </table>
-
-        <!-- Single / Double Mat -->
-        <div class="checkbox-group">
-          <div class="checkbox-item">
-            <input id="single-mat-1" type="checkbox">
-            <label for="single-mat-1">Single Mat / Malla Simple</label>
+      <div class="form-title">Concrete Job Documentation Form</div>
+    </header>
+    
+    <div class="form-container">
+      <!-- Job Information -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>📋</i> Job Information
+        </h2>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label for="name">Name / Nombre</label>
+            <input type="text" id="name">
           </div>
-          <div class="checkbox-item">
-            <input id="double-mat-1" type="checkbox">
-            <label for="double-mat-1">Double Mat / Malla Doble</label>
+          
+          <div class="input-group">
+            <label for="date">Date Poured / Fecha Vaciado</label>
+            <input type="text" id="date" value="">
+          </div>
+          
+          <div class="input-group">
+            <label for="address">Job Address / Dirección del Trabajo</label>
+            <input type="text" id="address">
+          </div>
+          
+          <div class="input-group">
+            <label for="customer">Customer / Cliente</label>
+            <input type="text" id="customer">
           </div>
         </div>
-
-        <!-- Rebar -->
-        <table>
-          <tr>
-            <th>Rebar Qty / Cant. Varilla</th>
-            <th>Size / Tamaño</th>
-          </tr>
-          <tr>
-            <td><input type="number" step="10" min="0"></td>
-            <td>
-              <select>
-                <option>#4</option>
-                <option>#5</option>
-                <option>#6</option>
-                <option>#7</option>
-                <option>#8</option>
-                <option>#9</option>
-                <option>#10</option>
-              </select>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Bulkheads -->
-        <table>
-          <tr>
-            <th>Bulkheads / Mamparos</th>
-            <th>Qty / Cantidad</th>
-            <th>Height / Altura</th>
-          </tr>
-          <tr>
-            <td></td>
-            <td><input type="number" step="1" min="0"></td>
-            <td><input type="number" step="0.01" min="0"></td>
-          </tr>
-        </table>
-
-        <!-- Piers -->
-        <table>
-          <tr>
-            <th>Piers Qty / Cant. Pilares</th>
-            <th>Size / Tamaño</th>
-            <th>Custom / Pers.</th>
-          </tr>
-          <tr>
-            <td><input type="number" step="1" min="0"></td>
-            <td>
-              <select id="piersize-1" onchange="toggleCustomSize(this)">
-                <option>2' x 2' x 12"</option>
-                <option>3' x 3' x 12"</option>
-              </select>
-            </td>
-            <td class="checkbox-item">
-              <input type="checkbox" id="piercustom-1" onchange="enableCustomInput(this)">
-              <label for="piercustom-1">Custom Size / Tamaño Pers.</label>
-              <input type="text" id="piercustominput-1" disabled style="width:120px;">
-            </td>
-          </tr>
-        </table>
-
-        <!-- Fireplace & Porch Pad -->
-        <div class="subsection-title">Fireplace / Chimenea</div>
-        <input type="text" style="width:100%; margin-bottom:8px;"> <!-- Reduced margin -->
+      </div>
+      
+      <!-- Concrete Sections -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>🧱</i> Concrete Sections
+        </h2>
         
-        <div class="subsection-title">Porch Pad / Base Porche</div>
-        <input type="text" style="width:100%; margin-bottom:8px;"> <!-- Reduced margin -->
-
-        <!-- Additional Materials -->
-        <div class="subsection-title">Additional Materials / Materiales Ad.</div>
-        <table>
-          <tr>
-            <th>Item / Artículo</th>
-            <th>Qty / Cantidad</th>
-            <th>Notes / Notas</th>
-          </tr>
-          <tr>
-            <td><input type="text"></td>
-            <td><input type="number" step="2" min="0"></td>
-            <td><input type="text"></td>
-          </tr>
-          <tr>
-            <td><input type="text"></td>
-            <td><input type="number" step="1" min="0"></td>
-            <td><input type="text"></td>
-          </tr>
-          <tr>
-            <td><input type="text"></td>
-            <td><input type="number" step="1" min="0"></td>
-            <td><input type="text"></td>
-          </tr>
+        <div id="sections-container">
+          <div class="section" id="section-1">
+            <div class="section-header">
+              <div class="section-number">Section 1</div>
+              <button class="btn btn-danger no-print" onclick="removeSection(this.parentNode.parentNode)">
+                Remove Section
+              </button>
+            </div>
+            
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Length (ft) / Largo (pies)</label>
+                <input type="number" step="100" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Width (in) / Ancho (pulg)</label>
+                <input type="number" step="6" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Depth (in) / Profundidad (pulg)</label>
+                <input type="number" step="6" min="0">
+              </div>
+            </div>
+            
+            <h3 class="subsection-title">Uprights / Verticales</h3>
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Quantity / Cantidad</label>
+                <input type="number" step="5" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Length (ft) / Largo (pies)</label>
+                <input type="number" step="1" min="0">
+              </div>
+            </div>
+            
+            <h3 class="subsection-title">Crossbars / Travesaños</h3>
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Quantity / Cantidad</label>
+                <input type="number" step="5" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Length (ft) / Largo (pies)</label>
+                <input type="number" step="1" min="0">
+              </div>
+            </div>
+            
+            <h3 class="subsection-title">Mat Type</h3>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="single-mat-1">
+                <label for="single-mat-1">Single Mat / Malla Simple</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="double-mat-1">
+                <label for="double-mat-1">Double Mat / Malla Doble</label>
+              </div>
+            </div>
+            
+            <h3 class="subsection-title">Rebar Details</h3>
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Rebar Qty / Cant. Varilla</label>
+                <input type="number" step="10" min="0">
+              </div>
+              
+              <div class="input-group">
+                <label>Size / Tamaño</label>
+                <select>
+                  <option>#4</option>
+                  <option>#5</option>
+                  <option>#6</option>
+                  <option>#7</option>
+                  <option>#8</option>
+                  <option>#9</option>
+                  <option>#10</option>
+                </select>
+              </div>
+            </div>
+            
+            <h3 class="subsection-title">Additional Elements</h3>
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Fireplace / Chimenea</label>
+                <input type="text">
+              </div>
+              
+              <div class="input-group">
+                <label>Porch Pad / Base Porche</label>
+                <input type="text">
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label>Section Notes / Notas Sección</label>
+              <textarea></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn btn-primary no-print" onclick="addSection()">
+            <i>➕</i> Add Section
+          </button>
+        </div>
+      </div>
+      
+      <!-- Concrete Information -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>🏗️</i> Concrete Information
+        </h2>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Concrete Company</label>
+            <select id="concrete-company">
+              <option value="">Select a company</option>
+              <option value="imi">IMI</option>
+              <option value="srm">SRM</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label>Other Company</label>
+            <input type="text" id="other-company" disabled>
+          </div>
+          
+          <div class="input-group">
+            <label>Yards Poured / Yardas Vertidas</label>
+            <input type="number" step="10" min="0">
+          </div>
+          
+          <div class="input-group">
+            <label>Strength (psi) / Resistencia (psi)</label>
+            <select>
+              <option>3000</option>
+              <option>3500</option>
+              <option>4000</option>
+              <option>4500</option>
+              <option>5000</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Additives / Aditivos</label>
+          <input type="text">
+        </div>
+      </div>
+      
+      <!-- Equipment & Hours -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>⏱️</i> Equipment & Hours
+        </h2>
+        
+        <table id="equipment-table">
+          <thead>
+            <tr>
+              <th>Equipment / Equipo</th>
+              <th>Hours / Horas</th>
+              <th>Notes / Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" value="Mini Excavator"></td>
+              <td>
+                <select class="hour-select">
+                  <option>0</option>
+                  <option>0.5</option>
+                  <option>1.0</option>
+                  <option>1.5</option>
+                  <option>2.0</option>
+                  <option>2.5</option>
+                  <option>3.0</option>
+                  <option>3.5</option>
+                  <option>4.0</option>
+                  <option>4.5</option>
+                  <option>5.0</option>
+                  <option>5.5</option>
+                  <option>6.0</option>
+                  <option>6.5</option>
+                  <option>7.0</option>
+                  <option>7.5</option>
+                  <option>8.0</option>
+                </select>
+              </td>
+              <td><input type="text"></td>
+            </tr>
+            <tr>
+              <td><input type="text" value="Skid Steer"></td>
+              <td>
+                <select class="hour-select">
+                  <option>0</option>
+                  <option>0.5</option>
+                  <option>1.0</option>
+                  <option>1.5</option>
+                  <option>2.0</option>
+                  <option>2.5</option>
+                  <option>3.0</option>
+                  <option>3.5</option>
+                  <option>4.0</option>
+                  <option>4.5</option>
+                  <option>5.0</option>
+                  <option>5.5</option>
+                  <option>6.0</option>
+                  <option>6.5</option>
+                  <option>7.0</option>
+                  <option>7.5</option>
+                  <option>8.0</option>
+                </select>
+              </td>
+              <td><input type="text"></td>
+            </tr>
+          </tbody>
         </table>
-
-        <!-- Section Notes -->
-        <div class="subsection-title">Section Notes / Notas Sección</div>
-        <textarea></textarea>
+        
+        <div class="btn-group">
+          <button class="btn btn-primary no-print" onclick="addEquipmentRow()">
+            <i>➕</i> Add Equipment
+          </button>
+        </div>
       </div>
-    </div>
-
-    <!-- ADD / COUNT SECTIONS -->
-    <button class="btn btn-blue no-print" onclick="addSection()">Add Section / Agregar Sección</button>
-    <div class="section-title">Number of Sections / Número de Secciones:</div>
-    <div class="checkbox-group" id="section-count-group"></div>
-
-    <!-- CONCRETE INFO -->
-    <div class="section-title">Concrete Info / Info de Concreto</div>
-    <div class="checkbox-group">
-      <div class="checkbox-item">
-        <input id="imi" name="concrete-company" type="checkbox" onclick="updateConcreteCompany('imi')">
-        <label for="imi">IMI</label>
+      
+      <!-- Crew Information -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>👷</i> Crew Information
+        </h2>
+        
+        <table id="crew-table">
+          <thead>
+            <tr>
+              <th>Name / Nombre</th>
+              <th>Role / Rol</th>
+              <th>Hours / Horas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text"></td>
+              <td><input type="text"></td>
+              <td>
+                <select class="hour-select">
+                  <option>0</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text"></td>
+              <td><input type="text"></td>
+              <td>
+                <select class="hour-select">
+                  <option>0</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="btn-group">
+          <button class="btn btn-primary no-print" onclick="addCrewMember()">
+            <i>➕</i> Add Crew Member
+          </button>
+        </div>
       </div>
-      <div class="checkbox-item">
-        <input id="srm" name="concrete-company" type="checkbox" onclick="updateConcreteCompany('srm')">
-        <label for="srm">SRM</label>
+      
+      <!-- Final Notes -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i>📝</i> Final Notes
+        </h2>
+        
+        <div class="input-group">
+          <label>Additional Notes / Notas Adicionales</label>
+          <textarea id="additional-notes"></textarea>
+        </div>
       </div>
-      <div class="input-group">
-        <label for="other-company">Other / Otro:</label>
-        <input id="other-company" class="input-field" type="text" oninput="updateConcreteCompany('other')">
+      
+      <!-- Action Buttons -->
+      <div class="btn-group">
+        <button class="btn btn-primary no-print" onclick="savePDF()">
+          <i>💾</i> Save as PDF
+        </button>
+        <button class="btn no-print" style="background: #4a5568; color: white;" onclick="window.print()">
+          <i>🖨️</i> Print Form
+        </button>
+        <button class="btn no-print" style="background: #38a169; color: white;" onclick="clearForm()">
+          <i>🧹</i> Clear Form
+        </button>
       </div>
     </div>
     
-    <table>
-      <tr>
-        <th>Yards Poured / Yardas Vertidas</th>
-      </tr>
-      <tr>
-        <td><select class="hour-select" id="yards-poured"></select></td>
-      </tr>
-    </table>
-    
-    <table>
-      <tr>
-        <th>Additives / Aditivos</th>
-        <th>Strength (psi) / Resistencia (psi)</th>
-      </tr>
-      <tr>
-        <td><input id="additives" class="input-field" type="text" style="width:100%"></td>
-        <td><select class="hour-select" id="strength"></select></td>
-      </tr>
-    </table>
-
-    <!-- PUMP CO. -->
-    <div class="section-title">Pump Co. / Empresa Bomba</div>
-    <div class="checkbox-group">
-      <div class="checkbox-item">
-        <input id="pump-cpp" name="pump-company" type="checkbox" onclick="updatePumpCompany('cpp')">
-        <label for="pump-cpp">CPP</label>
-      </div>
-      <div class="checkbox-item">
-        <input id="pump-brundage" name="pump-company" type="checkbox" onclick="updatePumpCompany('brundage')">
-        <label for="pump-brundage">Brundage</label>
-      </div>
-      <div class="input-group">
-        <label for="pump-other">Other / Otro:</label>
-        <input id="pump-other" class="input-field" type="text" oninput="updatePumpCompany('other')">
-      </div>
-    </div>
-
-    <!-- CREW INFO -->
-    <div class="section-title">Crew Info / Info del Equipo</div>
-    <table id="crew-table">
-      <tr>
-        <th>Name / Nombre</th>
-        <th>Role / Rol</th>
-        <th>Hours / Horas</th>
-      </tr>
-      <tr>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-    </table>
-    <button class="btn btn-blue no-print" onclick="addCrewMember()">Add Crew Member / Agregar Miembro</button>
-
-    <!-- EQUIPMENT USED -->
-    <div class="section-title">Equipment Used / Equipo Usado</div>
-    <table id="equipment-table">
-      <tr>
-        <th>Equipment / Equipo</th>
-        <th>Hours / Horas</th>
-        <th>Notes / Notas</th>
-      </tr>
-      <tr>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-      <tr>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-    </table>
-    <button class="btn btn-blue no-print" onclick="addEquipmentRow()">Add Equipment / Agregar Equipo</button>
-
-    <!-- EQUIP HRS / DESC -->
-    <div class="section-title">Equipment Hours & Description / Horas y Descripción</div>
-    <table>
-      <tr>
-        <th>Equipment</th>
-        <th>Hours</th>
-        <th>Description</th>
-      </tr>
-      <tr>
-        <td>MiniX</td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-      <tr>
-        <td>Hammer</td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-      <tr>
-        <td>Skid / Dingo</td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-      <tr>
-        <td>Step Pad</td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      </tr>
-    </table>
-
-    <!-- SUPPLIES USED -->
-    <div class="section-title">Supplies Used / Suministros Usados</div>
-    <table>
-      <tr>
-        <th>Supply / Suministro</th>
-        <th>Quantity / Cantidad</th>
-      </tr>
-      <tr>
-        <td>Paint / Pintura</td>
-        <td>
-          Boxes/Cajas <select class="hour-select"></select>
-          Cans/Latas <select class="hour-select"></select>
-        </td>
-      </tr>
-      <tr>
-        <td>Chairs (boxes) / Sillas (cajas)</td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td>Grade Pins (boxes) / Pines (cajas)</td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td>2 × 4 × 16'</td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td>Plywood (sheets) / Contrachapado</td>
-        <td><select class="hour-select"></select></td>
-      </tr>
-      <tr>
-        <td>Lumber Notes / Notas de Madera</td>
-        <td><textarea id="lumber-notes" style="height:80px"></textarea></td> <!-- Reduced height -->
-      </tr>
-    </table>
-
-    <!-- MANAGEMENT JOB CODING -->
-    <div class="section-title">Management Job Coding / Cod. Gestión</div>
-    <div class="input-group">
-      <label for="builder">Builder / Constructor:</label>
-      <input id="builder" class="input-field" type="text">
-    </div>
-    <div class="input-group">
-      <label for="city-county">City/County / Ciudad:</label>
-      <input id="city-county" class="input-field" type="text">
-    </div>
-    <div class="checkbox-group">
-      <div class="checkbox-item">
-        <input id="job-turnkey" type="checkbox">
-        <label for="job-turnkey">Turnkey / Llave Mano</label>
-      </div>
-      <div class="checkbox-item">
-        <input id="job-house" type="checkbox">
-        <label for="job-house">House / Casa</label>
-      </div>
-      <div class="checkbox-item">
-        <input id="job-labor" type="checkbox">
-        <label for="job-labor">Labor Only / Solo O.</label>
-      </div>
-      <div class="checkbox-item">
-        <input id="job-retaining" type="checkbox">
-        <label for="job-retaining">Retaining Wall / Muro</label>
-      </div>
-    </div>
-
-    <!-- ADDITIONAL NOTES -->
-    <div class="section-title">Additional Notes / Notas Adicionales</div>
-    <textarea id="additional-notes" style="height:100px"></textarea> <!-- Reduced height -->
-
-    <!-- SAVE AS PDF -->
-    <button class="btn btn-green no-print" onclick="savePDF()">Save as PDF / Guardar PDF</button>
+    <footer class="footer">
+      Concrete Job Form v2.0 | © 2023 Construction Pro Tools
+    </footer>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    // Generate dropdown options for hours/quantities
-    function generateHourOptions() {
-      let options = '';
-      for (let i = 0; i <= 200; i++) {
-        let val = (i * 0.5).toFixed(1);
-        options += `<option value="${val}">${val}</option>`;
-      }
-      return options;
-    }
-
-    // Initialize form on load
-    document.addEventListener('DOMContentLoaded', () => {
-      // Set today's date
-      document.getElementById('date').value = new Date().toLocaleDateString();
-      
-      // Populate all hour-select dropdowns
-      const hourSelects = document.querySelectorAll('select.hour-select');
-      const options = generateHourOptions();
-      hourSelects.forEach(sel => {
-        sel.innerHTML = options;
-        sel.value = '0';
-      });
+    // Set today's date
+    document.getElementById('date').value = new Date().toLocaleDateString();
+    
+    // Handle concrete company selection
+    document.getElementById('concrete-company').addEventListener('change', function() {
+      const otherField = document.getElementById('other-company');
+      otherField.disabled = this.value !== 'other';
+      if (this.value !== 'other') otherField.value = '';
     });
-
-    // Enter key navigation
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        const inputs = [...document.querySelectorAll('input:not([type=checkbox]), select, textarea')]
-          .filter(el => el.offsetParent);
-        const idx = inputs.indexOf(document.activeElement);
-        (inputs[idx + 1] || inputs[0]).focus();
-      }
-    });
-
+    
     // Save as PDF function
     function savePDF() {
       // Hide non-printable elements
-      const ui = document.querySelectorAll('.no-print');
-      ui.forEach(el => el.style.display = 'none');
+      const noPrintElements = document.querySelectorAll('.no-print');
+      noPrintElements.forEach(el => el.style.display = 'none');
       
       const element = document.getElementById('form-root');
       
@@ -703,7 +741,7 @@
       document.body.appendChild(clone);
       
       const opt = {
-        margin: 0.25, // Reduced margin
+        margin: 0.3,
         filename: 'concrete_job_form.pdf',
         pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
         html2canvas: {
@@ -716,7 +754,7 @@
           unit: 'in', 
           format: 'letter', 
           orientation: 'portrait',
-          hotfixes: ['px_scaling']  // Fixes pixel scaling issues
+          hotfixes: ['px_scaling']
         }
       };
 
@@ -728,29 +766,113 @@
         .then(() => {
           // Clean up and restore UI
           document.body.removeChild(clone);
-          ui.forEach(el => el.style.display = '');
+          noPrintElements.forEach(el => el.style.display = '');
         })
         .catch(err => {
           console.error('PDF generation failed:', err);
           document.body.removeChild(clone);
-          ui.forEach(el => el.style.display = '');
+          noPrintElements.forEach(el => el.style.display = '');
           alert('Failed to generate PDF. Please try again.');
         });
     }
-
-    // Dynamic Sections
+    
+    // Clear form function
+    function clearForm() {
+      if (confirm('Are you sure you want to clear all form data?')) {
+        document.querySelectorAll('input:not([type=button]):not([type=submit]), textarea, select').forEach(el => {
+          if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = false;
+          } else if (el.tagName === 'SELECT') {
+            el.selectedIndex = 0;
+          } else {
+            el.value = '';
+          }
+        });
+        // Reset date
+        document.getElementById('date').value = new Date().toLocaleDateString();
+      }
+    }
+    
+    // Add equipment row
+    function addEquipmentRow() {
+      const table = document.getElementById('equipment-table');
+      const row = table.insertRow(-1);
+      row.innerHTML = `
+        <td><input type="text"></td>
+        <td>
+          <select class="hour-select">
+            <option>0</option>
+            <option>0.5</option>
+            <option>1.0</option>
+            <option>1.5</option>
+            <option>2.0</option>
+            <option>2.5</option>
+            <option>3.0</option>
+            <option>3.5</option>
+            <option>4.0</option>
+            <option>4.5</option>
+            <option>5.0</option>
+            <option>5.5</option>
+            <option>6.0</option>
+            <option>6.5</option>
+            <option>7.0</option>
+            <option>7.5</option>
+            <option>8.0</option>
+          </select>
+        </td>
+        <td><input type="text"></td>
+      `;
+    }
+    
+    // Add crew member
+    function addCrewMember() {
+      const table = document.getElementById('crew-table');
+      const row = table.insertRow(-1);
+      row.innerHTML = `
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td>
+          <select class="hour-select">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+          </select>
+        </td>
+      `;
+    }
+    
+    // Section management
     let sectionCount = 1;
+    
     function addSection() {
       sectionCount++;
       const template = document.getElementById('section-1').cloneNode(true);
       template.id = 'section-' + sectionCount;
-      template.querySelectorAll('input, textarea').forEach(inp => {
-        if (inp.type === 'checkbox') inp.checked = false;
-        else inp.value = '';
+      
+      // Clear inputs in the new section
+      template.querySelectorAll('input:not([type=button]), textarea, select').forEach(el => {
+        if (el.type === 'checkbox') {
+          el.checked = false;
+        } else {
+          el.value = '';
+        }
       });
       
+      // Update section number
+      template.querySelector('.section-number').textContent = `Section ${sectionCount}`;
+      
       // Update IDs for section-specific elements
-      ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(prefix => {
+      ['single-mat-', 'double-mat-'].forEach(prefix => {
         const el = template.querySelector(`[id^="${prefix}"]`);
         if (el) {
           el.id = prefix + sectionCount;
@@ -759,110 +881,15 @@
         }
       });
       
-      template.querySelector('.section-title').textContent = 
-        'Footing Section / Sección de Cimentación ' + sectionCount;
-      
-      // Populate hour-select dropdowns in the new section
-      const options = generateHourOptions();
-      template.querySelectorAll('select.hour-select').forEach(sel => {
-        sel.innerHTML = options;
-        sel.value = '0';
-      });
-      
       document.getElementById('sections-container').appendChild(template);
     }
     
-    function removeSection(sec) {
-      const sections = [...document.querySelectorAll('#sections-container .section')];
+    function removeSection(section) {
+      const sections = document.querySelectorAll('.section');
       if (sections.length > 1) {
-        sec.remove();
-        renumberSections();
+        section.remove();
       } else {
-        alert('At least one section is required');
-      }
-    }
-    
-    function renumberSections() {
-      sectionCount = 0;
-      document.querySelectorAll('#sections-container .section').forEach((sec, i) => {
-        sectionCount = i + 1;
-        sec.id = 'section-' + sectionCount;
-        sec.querySelector('.section-title').textContent = 
-          'Footing Section / Sección de Cimentación ' + sectionCount;
-      });
-    }
-
-    // Custom pier size
-    function enableCustomInput(cb) {
-      const idParts = cb.id.split('-');
-      if (idParts.length < 2) return;
-      
-      const sectionId = idParts[1];
-      const inp = document.getElementById('piercustominput-' + sectionId);
-      if (inp) {
-        inp.disabled = !cb.checked;
-        if (!cb.checked) inp.value = '';
-      }
-    }
-    
-    function toggleCustomSize(sel) {
-      const idParts = sel.id.split('-');
-      if (idParts.length < 2) return;
-      
-      const sectionId = idParts[1];
-      const cb = document.getElementById('piercustom-' + sectionId);
-      const inp = document.getElementById('piercustominput-' + sectionId);
-      
-      if (cb && inp) {
-        cb.checked = false;
-        inp.disabled = true;
-        inp.value = '';
-      }
-    }
-
-    // Crew & Equipment rows
-    function addCrewMember() {
-      const table = document.getElementById('crew-table');
-      const row = table.insertRow(-1);
-      row.innerHTML = `
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-      `;
-      
-      // Populate the new dropdown
-      const options = generateHourOptions();
-      row.querySelector('select.hour-select').innerHTML = options;
-    }
-    
-    function addEquipmentRow() {
-      const table = document.getElementById('equipment-table');
-      const row = table.insertRow(-1);
-      row.innerHTML = `
-        <td><input type="text"></td>
-        <td><select class="hour-select"></select></td>
-        <td><input type="text"></td>
-      `;
-      
-      // Populate the new dropdown
-      const options = generateHourOptions();
-      row.querySelector('select.hour-select').innerHTML = options;
-    }
-
-    // Single-select helpers
-    function updateConcreteCompany(c) {
-      document.querySelectorAll('input[name="concrete-company"]').forEach(b => b.checked = false);
-      if (c === 'imi' || c === 'srm') {
-        document.getElementById(c).checked = true;
-        document.getElementById('other-company').value = '';
-      }
-    }
-    
-    function updatePumpCompany(c) {
-      document.querySelectorAll('input[name="pump-company"]').forEach(b => b.checked = false);
-      if (c === 'cpp' || c === 'brundage') {
-        document.getElementById('pump-' + c).checked = true;
-        document.getElementById('pump-other').value = '';
+        alert('You need at least one section');
       }
     }
   </script>
