@@ -8,7 +8,7 @@
     body{font-family:Arial,sans-serif;margin:20px;line-height:1.5;}
     .form-container{max-width:900px;margin:0 auto;padding:20px;
                     background:#f9f9f9;border:1px solid #ccc;border-radius:6px;}
-    .header{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:0px;}
+    .header{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:18px;}
     .input-group{display:flex;align-items:center;gap:8px;font-size:15px;}
     label{font-weight:bold;}
     .input-field{border:none;border-bottom:1px solid #333;
@@ -64,24 +64,24 @@
 </head>
 <body>
 
-  <div class="form-container" id="form-root">
+  <div class="form-container" id="form-root" role="form" aria-label="Concrete Job Form">
     <!-- HEADER -->
     <div class="header">
       <div class="input-group">
         <label for="name">Name / Nombre:</label>
-        <input id="name" class="input-field" type="text" placeholder="" />
+        <input id="name" class="input-field" type="text" placeholder="" aria-label="Name or Nombre" />
       </div>
       <div class="input-group">
         <label for="date">Date Poured / Fecha Vaciado:</label>
-        <input id="date" class="input-field" type="text" placeholder="" />
+        <input id="date" class="input-field" type="text" placeholder="" aria-label="Date Poured or Fecha Vaciado" />
       </div>
       <div class="input-group" style="flex:1 1 100%;">
         <label for="address">Job Address / Dirección del Trabajo:</label>
-        <input id="address" class="input-field" style="width:400px" type="text" placeholder="" />
+        <input id="address" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Job Address or Dirección del Trabajo" />
       </div>
       <div class="input-group" style="flex:1 1 100%;">
         <label for="customer">Customer / Cliente:</label>
-        <input id="customer" class="input-field" style="width:400px" type="text" placeholder="" />
+        <input id="customer" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Customer or Cliente" />
       </div>
     </div>
 
@@ -91,10 +91,12 @@
         <button
           class="remove-section no-print"
           onclick="removeSection(this.parentNode)"
+          aria-label="Remove Footing Section 1"
+          type="button"
         >
           Remove
         </button>
-        <div class="section-title">
+        <div class="section-title" id="section-title-1" aria-level="2" role="heading">
           Footing Section / Sección de Cimentación 1
         </div>
 
@@ -108,11 +110,11 @@
           <tr>
             <td>
               <div class="counter-group">
-                <input type="number" step="100" min="0" placeholder="" />
+                <input type="number" step="100" min="0" placeholder="" aria-label="Length in feet" oninput="validateNonNegative(this)" />
               </div>
             </td>
-            <td><input type="number" step="6" min="0" placeholder="" /></td>
-            <td><input type="number" step="6" min="0" placeholder="" /></td>
+            <td><input type="number" step="6" min="0" placeholder="" aria-label="Width in inches" oninput="validateNonNegative(this)" /></td>
+            <td><input type="number" step="6" min="0" placeholder="" aria-label="Depth in inches" oninput="validateNonNegative(this)" /></td>
           </tr>
         </table>
 
@@ -124,8 +126,8 @@
           </tr>
           <tr>
             <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0" placeholder="" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
+            <td><input type="number" step="5" min="0" placeholder="" aria-label="Uprights Quantity" oninput="validateNonNegative(this)" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Uprights Length in feet" oninput="validateNonNegative(this)" /></td>
           </tr>
         </table>
 
@@ -137,19 +139,19 @@
           </tr>
           <tr>
             <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0" placeholder="" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
+            <td><input type="number" step="5" min="0" placeholder="" aria-label="Crossbars Quantity" oninput="validateNonNegative(this)" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Crossbars Length in feet" oninput="validateNonNegative(this)" /></td>
           </tr>
         </table>
 
         <!-- Single / Double Mat -->
-        <div class="checkbox-group">
+        <div class="checkbox-group" role="group" aria-label="Mat Selection Single or Double">
           <div class="checkbox-item">
-            <input id="single-mat-1" type="checkbox" />
+            <input id="single-mat-1" name="mat-type-1" type="radio" aria-label="Single Mat / Malla Simple" />
             <label for="single-mat-1">Single Mat / Malla Simple</label>
           </div>
           <div class="checkbox-item">
-            <input id="double-mat-1" type="checkbox" />
+            <input id="double-mat-1" name="mat-type-1" type="radio" aria-label="Double Mat / Malla Doble" />
             <label for="double-mat-1">Double Mat / Malla Doble</label>
           </div>
         </div>
@@ -163,11 +165,11 @@
           <tr>
             <td>
               <div class="counter-group">
-                <input type="number" step="10" min="0" placeholder="" />
+                <input type="number" step="10" min="0" placeholder="" aria-label="Rebar Quantity" oninput="validateNonNegative(this)" />
               </div>
             </td>
             <td>
-              <select>
+              <select aria-label="Rebar Size">
                 <option value="">Select Size</option>
                 <option>#4</option>
                 <option>#5</option>
@@ -190,8 +192,8 @@
           </tr>
           <tr>
             <td></td>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
-            <td><input type="number" step="0.01" min="0" placeholder="" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Bulkheads Quantity" oninput="validateNonNegative(this)" /></td>
+            <td><input type="number" step="0.01" min="0" placeholder="" aria-label="Bulkheads Height" oninput="validateNonNegative(this)" /></td>
           </tr>
         </table>
 
@@ -203,10 +205,11 @@
             <th>Custom / Pers.</th>
           </tr>
           <tr>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Piers Quantity" oninput="validateNonNegative(this)" /></td>
             <td>
               <select
                 id="piersize-1"
+                aria-label="Pier Size"
                 onchange="toggleCustomSize(this)"
               >
                 <option value="">Select Size</option>
@@ -218,6 +221,7 @@
               <input
                 type="checkbox"
                 id="piercustom-1"
+                aria-label="Custom Size / Tamaño Pers."
                 onchange="enableCustomInput(this)"
               />
               <label for="piercustom-1">Custom Size / Tamaño Pers.</label>
@@ -227,6 +231,7 @@
                 disabled
                 style="width:120px"
                 placeholder=""
+                aria-label="Custom Pier Size Input"
               />
             </td>
           </tr>
@@ -234,9 +239,9 @@
 
         <!-- Fireplace & Porch Pad -->
         <div class="subsection-title">Fireplace / Chimenea</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" />
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Fireplace or Chimenea" />
         <div class="subsection-title">Porch Pad / Base Porche</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" />
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Porch Pad or Base Porche" />
 
         <!-- Additional Materials -->
         <div class="subsection-title">Additional Materials / Materiales Ad.</div>
@@ -248,49 +253,50 @@
           </tr>
           <tr>
             <td>
-              <input type="text" placeholder="" />
+              <input type="text" placeholder="" aria-label="Additional Material Item 1" />
             </td>
-            <td><input type="number" step="2" min="0" placeholder="" /></td>
-            <td><input type="text" placeholder="" /></td>
+            <td><input type="number" step="2" min="0" placeholder="" aria-label="Additional Material Quantity 1" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 1" /></td>
           </tr>
           <tr>
-            <td><input type="text" placeholder="" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
-            <td><input type="text" placeholder="" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Item 2" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 2" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 2" /></td>
           </tr>
           <tr>
-            <td><input type="text" placeholder="" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" /></td>
-            <td><input type="text" placeholder="" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Item 3" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 3" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 3" /></td>
           </tr>
         </table>
 
         <!-- Section Notes -->
         <div class="subsection-title">Section Notes / Notas Sección</div>
-        <textarea placeholder=""></textarea>
+        <textarea placeholder="" aria-label="Section Notes"></textarea>
       </div>
     </div>
 
     <!-- ADD / COUNT SECTIONS -->
-    <button class="btn btn-blue no-print" onclick="addSection()">
+    <button class="btn btn-blue no-print" onclick="addSection()" type="button" aria-label="Add Footing Section">
       Add Section / Agregar Sección
     </button>
-    <div class="section-title">
+    <div class="section-title" aria-level="2" role="heading">
       Number of Sections / Número de Secciones:
     </div>
-    <div class="checkbox-group" id="section-count-group">
+    <div class="checkbox-group" id="section-count-group" role="radiogroup" aria-label="Number of Sections">
       <!-- checkboxes generated by script -->
     </div>
 
     <!-- CONCRETE INFO -->
-    <div class="section-title">Concrete Info / Info de Concreto</div>
-    <div class="checkbox-group">
+    <div class="section-title" aria-level="2" role="heading">Concrete Info / Info de Concreto</div>
+    <div class="checkbox-group" role="radiogroup" aria-label="Concrete Company">
       <div class="checkbox-item">
         <input
           id="imi"
           name="concrete-company"
-          type="checkbox"
+          type="radio"
           onclick="updateConcreteCompany('imi')"
+          aria-label="IMI Concrete Company"
         />
         <label for="imi">IMI</label>
       </div>
@@ -298,8 +304,9 @@
         <input
           id="srm"
           name="concrete-company"
-          type="checkbox"
+          type="radio"
           onclick="updateConcreteCompany('srm')"
+          aria-label="SRM Concrete Company"
         />
         <label for="srm">SRM</label>
       </div>
@@ -311,6 +318,7 @@
           type="text"
           oninput="updateConcreteCompany('other')"
           placeholder=""
+          aria-label="Other Concrete Company"
         />
       </div>
     </div>
@@ -321,7 +329,7 @@
       <tr>
         <td>
           <div class="counter-group">
-            <input id="yards-tens" type="number" step="10" min="0" placeholder="" />
+            <input id="yards-tens" type="number" step="10" min="0" placeholder="" aria-label="Yards Poured" oninput="validateNonNegative(this)" />
           </div>
         </td>
       </tr>
@@ -339,21 +347,23 @@
             type="text"
             style="width:100%"
             placeholder=""
+            aria-label="Additives"
           />
         </td>
-        <td><input id="strength" type="number" step="500" min="3000" placeholder="" /></td>
+        <td><input id="strength" type="number" step="500" min="3000" placeholder="" aria-label="Strength PSI" oninput="validateMinValue(this,3000)" /></td>
       </tr>
     </table>
 
     <!-- PUMP CO. -->
-    <div class="section-title">Pump Co. / Empresa Bomba</div>
-    <div class="checkbox-group">
+    <div class="section-title" aria-level="2" role="heading">Pump Co. / Empresa Bomba</div>
+    <div class="checkbox-group" role="radiogroup" aria-label="Pump Company">
       <div class="checkbox-item">
         <input
           id="pump-cpp"
           name="pump-company"
-          type="checkbox"
+          type="radio"
           onclick="updatePumpCompany('cpp')"
+          aria-label="CPP Pump Company"
         />
         <label for="pump-cpp">CPP</label>
       </div>
@@ -361,8 +371,9 @@
         <input
           id="pump-brundage"
           name="pump-company"
-          type="checkbox"
+          type="radio"
           onclick="updatePumpCompany('brundage')"
+          aria-label="Brundage Pump Company"
         />
         <label for="pump-brundage">Brundage</label>
       </div>
@@ -374,64 +385,65 @@
           type="text"
           oninput="updatePumpCompany('other')"
           placeholder=""
+          aria-label="Other Pump Company"
         />
       </div>
     </div>
 
     <!-- CREW INFO -->
-    <div class="section-title">Crew Info / Info del Equipo</div>
-    <table id="crew-table">
+    <div class="section-title" aria-level="2" role="heading">Crew Info / Info del Equipo</div>
+    <table id="crew-table" aria-label="Crew Information">
       <tr>
         <th>Name / Nombre</th>
         <th>Role / Rol</th>
         <th>Hours / Horas</th>
       </tr>
       <tr>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
       </tr>
     </table>
-    <button class="btn btn-blue no-print" onclick="addCrewMember()">
+    <button class="btn btn-blue no-print" onclick="addCrewMember()" type="button" aria-label="Add Crew Member">
       Add Crew Member / Agregar Miembro
     </button>
 
     <!-- EQUIPMENT USED -->
-    <div class="section-title">Equipment Used / Equipo Usado</div>
-    <table id="equipment-table">
+    <div class="section-title" aria-level="2" role="heading">Equipment Used / Equipo Usado</div>
+    <table id="equipment-table" aria-label="Equipment Used">
       <tr>
         <th>Equipment / Equipo</th>
         <th>Hours / Horas</th>
         <th>Notes / Notas</th>
       </tr>
       <tr>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="text" placeholder="" aria-label="Equipment Name" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>
       </tr>
       <tr>
-        <td><input type="text" placeholder="" /></td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="text" placeholder="" aria-label="Equipment Name" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>
       </tr>
     </table>
-    <button class="btn btn-blue no-print" onclick="addEquipmentRow()">
+    <button class="btn btn-blue no-print" onclick="addEquipmentRow()" type="button" aria-label="Add Equipment">
       Add Equipment / Agregar Equipo
     </button>
 
     <!-- EQUIP HRS / DESC -->
-    <div class="section-title">Equipment Hours & Description / Horas y Descripción</div>
-    <table>
+    <div class="section-title" aria-level="2" role="heading">Equipment Hours & Description / Horas y Descripción</div>
+    <table aria-label="Equipment Hours and Description">
       <tr>
         <th>Equipment</th>
         <th>Hours</th>
@@ -439,29 +451,29 @@
       </tr>
       <tr>
         <td>MiniX</td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="MiniX Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="MiniX Description" /></td>
       </tr>
       <tr>
         <td>Hammer</td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Hammer Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="Hammer Description" /></td>
       </tr>
       <tr>
         <td>Skid / Dingo</td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Skid or Dingo Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="Skid or Dingo Description" /></td>
       </tr>
       <tr>
         <td>Step Pad</td>
-        <td><input type="number" step="0.5" placeholder="" /></td>
-        <td><input type="text" placeholder="" /></td>
+        <td><input type="number" step="0.5" placeholder="" aria-label="Step Pad Hours" oninput="validateNonNegative(this)" /></td>
+        <td><input type="text" placeholder="" aria-label="Step Pad Description" /></td>
       </tr>
     </table>
 
     <!-- SUPPLIES USED -->
-    <div class="section-title">Supplies Used / Suministros Usados</div>
-    <table>
+    <div class="section-title" aria-level="2" role="heading">Supplies Used / Suministros Usados</div>
+    <table aria-label="Supplies Used">
       <tr>
         <th>Supply / Suministro</th>
         <th>Quantity / Notas</th>
@@ -469,67 +481,67 @@
       <tr>
         <td>Paint / Pintura</td>
         <td>
-          Boxes/Cajas <input type="number" style="width:60px" placeholder="" />
-          Cans/Latas <input type="number" style="width:60px" placeholder="" />
+          Boxes/Cajas <input type="number" style="width:60px" placeholder="" aria-label="Paint Boxes Quantity" oninput="validateNonNegative(this)" />
+          Cans/Latas <input type="number" style="width:60px" placeholder="" aria-label="Paint Cans Quantity" oninput="validateNonNegative(this)" />
         </td>
       </tr>
       <tr>
         <td>Chairs (boxes) / Sillas (cajas)</td>
-        <td><input type="number" placeholder="" /></td>
+        <td><input type="number" placeholder="" aria-label="Chairs Boxes Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
         <td>Grade Pins (boxes) / Pines (cajas)</td>
-        <td><input type="number" placeholder="" /></td>
+        <td><input type="number" placeholder="" aria-label="Grade Pins Boxes Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
         <td>2 × 4 × 16'</td>
-        <td><input type="number" placeholder="" /></td>
+        <td><input type="number" placeholder="" aria-label="2x4x16 Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
         <td>Plywood (sheets) / Contrachapado</td>
-        <td><input type="number" placeholder="" /></td>
+        <td><input type="number" placeholder="" aria-label="Plywood Sheets Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
         <td>Lumber Notes / Notas de Madera</td>
-        <td><textarea id="lumber-notes" style="height:100px" placeholder=""></textarea></td>
+        <td><textarea id="lumber-notes" style="height:100px" placeholder="" aria-label="Lumber Notes"></textarea></td>
       </tr>
     </table>
 
     <!-- MANAGEMENT JOB CODING -->
-    <div class="section-title">Management Job Coding / Cod. Gestión</div>
+    <div class="section-title" aria-level="2" role="heading">Management Job Coding / Cod. Gestión</div>
     <div class="input-group">
       <label for="builder">Builder / Constructor:</label>
-      <input id="builder" class="input-field" type="text" placeholder="" />
+      <input id="builder" class="input-field" type="text" placeholder="" aria-label="Builder or Constructor" />
     </div>
     <div class="input-group">
       <label for="city-county">City/County / Ciudad:</label>
-      <input id="city-county" class="input-field" type="text" placeholder="" />
+      <input id="city-county" class="input-field" type="text" placeholder="" aria-label="City or County" />
     </div>
-    <div class="checkbox-group">
+    <div class="checkbox-group" role="group" aria-label="Job Type">
       <div class="checkbox-item">
-        <input id="job-turnkey" type="checkbox" />
+        <input id="job-turnkey" type="checkbox" aria-label="Turnkey Job" />
         <label for="job-turnkey">Turnkey / Llave Mano</label>
       </div>
       <div class="checkbox-item">
-        <input id="job-house" type="checkbox" />
+        <input id="job-house" type="checkbox" aria-label="House Job" />
         <label for="job-house">House / Casa</label>
       </div>
       <div class="checkbox-item">
-        <input id="job-labor" type="checkbox" />
+        <input id="job-labor" type="checkbox" aria-label="Labor Only Job" />
         <label for="job-labor">Labor Only / Solo O.</label>
       </div>
       <div class="checkbox-item">
-        <input id="job-retaining" type="checkbox" />
+        <input id="job-retaining" type="checkbox" aria-label="Retaining Wall Job" />
         <label for="job-retaining">Retaining Wall / Muro</label>
       </div>
     </div>
 
     <!-- ADDITIONAL NOTES -->
-    <div class="section-title">Additional Notes / Notas Adicionales</div>
-    <textarea id="additional-notes" placeholder=""></textarea>
+    <div class="section-title" aria-level="2" role="heading">Additional Notes / Notas Adicionales</div>
+    <textarea id="additional-notes" placeholder="" aria-label="Additional Notes"></textarea>
 
     <!-- SAVE AS PDF -->
-    <button class="btn btn-green no-print" onclick="savePDF()">
+    <button class="btn btn-green no-print" onclick="savePDF()" type="button" aria-label="Save form as PDF">
       Save as PDF / Guardar PDF
     </button>
   </div>
@@ -551,7 +563,20 @@
       }
     });
 
-    // Fixed PDF saving function
+    // Validate number inputs to prevent negative or invalid values
+    function validateNonNegative(input) {
+      if (input.value !== '' && Number(input.value) < 0) {
+        input.value = '';
+      }
+    }
+    // Validate minimum value for inputs like strength psi
+    function validateMinValue(input, min) {
+      if (input.value !== '' && Number(input.value) < min) {
+        input.value = '';
+      }
+    }
+
+    // Fixed PDF saving function with improved cleanup and error handling
     function savePDF() {
       // Hide non-printable elements
       const ui = document.querySelectorAll('.no-print');
@@ -603,7 +628,9 @@
         })
         .catch(err => {
           console.error('PDF generation failed:', err);
-          document.body.removeChild(clone);
+          if (document.body.contains(clone)) {
+            document.body.removeChild(clone);
+          }
           ui.forEach((el) => (el.style.display = ''));
           alert('Failed to generate PDF. Please try again.');
         });
@@ -611,19 +638,52 @@
 
     // Dynamic Sections
     let sectionCount = 1;
+
+    // Generate section count radio buttons for accessibility and single selection
+    function updateSectionCountRadios() {
+      const container = document.getElementById('section-count-group');
+      container.innerHTML = '';
+      for (let i = 1; i <= sectionCount; i++) {
+        const id = 'section-count-' + i;
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'section-count';
+        radio.id = id;
+        radio.value = i;
+        radio.setAttribute('aria-label', `Select ${i} sections`);
+        radio.onclick = () => updateSectionCount(i);
+        if (i === sectionCount) radio.checked = true;
+
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = i;
+
+        const div = document.createElement('div');
+        div.className = 'checkbox-item';
+        div.appendChild(radio);
+        div.appendChild(label);
+
+        container.appendChild(div);
+      }
+    }
+
     function addSection() {
       sectionCount++;
       const t = document.getElementById('section-1').cloneNode(true);
       t.id = 'section-' + sectionCount;
-      t.querySelectorAll('input,textarea').forEach((el) => {
-        if (el.type === 'checkbox') el.checked = false;
+      t.querySelectorAll('input,textarea,select').forEach((el) => {
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
         else el.value = '';
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
       });
       ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
         (pref) => {
           const el = t.querySelector('[id^="' + pref + '"]');
           if (el) {
             el.id = pref + sectionCount;
+            if (el.type === 'radio') {
+              el.name = 'mat-type-' + sectionCount; // update radio group name
+            }
             const lbl = t.querySelector('label[for^="' + pref + '"]');
             if (lbl) lbl.htmlFor = el.id;
           }
@@ -631,17 +691,30 @@
       );
       t.querySelector('.section-title').textContent =
         'Footing Section / Sección de Cimentación ' + sectionCount;
+
+      // Update aria-labels on remove button and others in the cloned section
+      const removeBtn = t.querySelector('.remove-section');
+      removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
+
+      // Update section title aria attributes
+      const sectionTitle = t.querySelector('.section-title');
+      sectionTitle.id = 'section-title-' + sectionCount;
+
       document.getElementById('sections-container').appendChild(t);
+      updateSectionCountRadios();
     }
+
     function removeSection(sec) {
       const all = [...document.querySelectorAll('#sections-container .section')];
       if (all.length === 1) {
         alert('At least one section is required');
         return;
       }
+      if (!confirm('Are you sure you want to remove this section?')) return;
       sec.remove();
       renumber();
     }
+
     function renumber() {
       sectionCount = 0;
       document.querySelectorAll('#sections-container .section').forEach((s, i) => {
@@ -649,16 +722,46 @@
         s.id = 'section-' + sectionCount;
         s.querySelector('.section-title').textContent =
           'Footing Section / Sección de Cimentación ' + sectionCount;
+
+        // Update aria-label on remove button
+        const removeBtn = s.querySelector('.remove-section');
+        if (removeBtn) {
+          removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
+        }
+
+        // Update IDs and labels for mat radios and pier inputs
+        ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
+          (pref) => {
+            const el = s.querySelector('[id^="' + pref + '"]');
+            if (el) {
+              el.id = pref + sectionCount;
+              if (el.type === 'radio') {
+                el.name = 'mat-type-' + sectionCount;
+              }
+              const lbl = s.querySelector('label[for^="' + pref + '"]');
+              if (lbl) lbl.htmlFor = el.id;
+            }
+          }
+        );
+
+        // Update section title aria attributes
+        const sectionTitle = s.querySelector('.section-title');
+        sectionTitle.id = 'section-title-' + sectionCount;
       });
+      updateSectionCountRadios();
     }
+
     function updateSectionCount(n) {
       document.querySelectorAll('input[name="section-count"]').forEach((c) => (c.checked = false));
-      document.getElementById('section-count-' + n).checked = true;
+      const radio = document.getElementById('section-count-' + n);
+      if (radio) radio.checked = true;
       while (sectionCount < n) addSection();
       while (sectionCount > n) {
+        if (sectionCount === 1) break; // never remove last
         document.querySelector('#sections-container .section:last-child').remove();
         sectionCount--;
       }
+      updateSectionCountRadios();
     }
 
     // Custom pier size
@@ -681,29 +784,31 @@
     function addCrewMember() {
       const r = document.getElementById('crew-table').insertRow(-1);
       r.innerHTML =
-        '<td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td><td><input type="number" step="0.5" placeholder=""></td>';
+        '<td><input type="text" placeholder="" aria-label="Crew Member Name" /></td><td><input type="text" placeholder="" aria-label="Crew Member Role" /></td><td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>';
     }
     function addEquipmentRow() {
       const r = document.getElementById('equipment-table').insertRow(-1);
       r.innerHTML =
-        '<td><input type="text" placeholder=""></td><td><input type="number" step="0.5" placeholder=""></td><td><input type="text" placeholder=""></td>';
+        '<td><input type="text" placeholder="" aria-label="Equipment Name" /></td><td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td><td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>';
     }
 
-    // Single-select helpers
+    // Single-select helpers for concrete company radios
     function updateConcreteCompany(c) {
-      document.querySelectorAll('input[name="concrete-company"]').forEach((b) => (b.checked = false));
       if (c === 'imi' || c === 'srm') {
         document.getElementById(c).checked = true;
         document.getElementById('other-company').value = '';
       }
     }
+    // Single-select helpers for pump company radios
     function updatePumpCompany(c) {
-      document.querySelectorAll('input[name="pump-company"]').forEach((b) => (b.checked = false));
       if (c === 'cpp' || c === 'brundage') {
         document.getElementById('pump-' + c).checked = true;
         document.getElementById('pump-other').value = '';
       }
     }
+
+    // Initialize section count radios on page load
+    updateSectionCountRadios();
   </script>
 </body>
 </html>
