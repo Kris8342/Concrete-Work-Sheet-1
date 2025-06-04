@@ -5,57 +5,217 @@
   <title>Concrete Job Form</title>
   <style>
     /* ===== SCREEN STYLES ===== */
-    body{font-family:Arial,sans-serif;margin:20px;line-height:1.5;}
-    .form-container{max-width:900px;margin:0 auto;padding:20px;
-                    background:#f9f9f9;border:1px solid #ccc;border-radius:6px;}
-    .header{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:18px;}
-    .input-group{display:flex;align-items:center;gap:8px;font-size:15px;}
-    label{font-weight:bold;}
-    .input-field{border:none;border-bottom:1px solid #333;
-                 padding:4px;width:200px;font-size:15px;}
-    .section-title{font-size:18px;font-weight:bold;margin:20px 0 10px;
-                   border-bottom:2px solid #333;padding-bottom:4px;}
-    .subsection-title{font-size:16px;font-weight:bold;margin:15px 0 8px;}
-    table{width:100%;border-collapse:collapse;margin-bottom:15px;font-size:14px;}
-    th,td{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top;}
-    th{background:#f2f2f2;font-weight:bold;}
-    .checkbox-group{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:14px;}
-    .checkbox-item{display:flex;align-items:center;gap:5px;font-size:14px;}
-    .section{background:#fff;border:1px solid #ddd;padding:15px;
-             margin-bottom:20px;border-radius:5px;page-break-inside:avoid;}
-    .remove-section{background:#f44336;color:#fff;border:none;border-radius:4px;
-                     padding:5px 10px;cursor:pointer;float:right;}
-    textarea{width:100%;height:80px;border:1px solid #ddd;padding:8px;resize:vertical;}
-    .counter-group{display:flex;gap:6px;}
-    .counter-group input{width:70px;}
-    .btn{padding:8px 15px;border:none;border-radius:4px;
-         color:#fff;font-size:14px;cursor:pointer;margin:10px 10px 0 0;}
-    .btn-green{background:#4caf50;}
-    .btn-blue {background:#2196f3;}
-    .no-print{display:inline-block;}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.5;
+    }
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 18px;
+      /* Prevent header break */
+      page-break-inside: avoid;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+    label {
+      font-weight: bold;
+    }
+    .input-field {
+      border: none;
+      border-bottom: 1px solid #333;
+      padding: 4px;
+      width: 200px;
+      font-size: 15px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .subsection-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 15px 0 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 2px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 14px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      page-break-inside: avoid;
+    }
+    .remove-section {
+      background: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      float: right;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      border: 1px solid #ddd;
+      padding: 8px;
+      resize: vertical;
+    }
+    .counter-group {
+      display: flex;
+      gap: 6px;
+    }
+    .counter-group input {
+      width: 70px;
+    }
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 10px 10px 0 0;
+    }
+    .btn-green {
+      background: #4caf50;
+    }
+    .btn-blue {
+      background: #2196f3;
+    }
+    .btn-toggle {
+      background: #607d8b;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .no-print {
+      display: inline-block;
+    }
+    /* Wrap toggle-able sections */
+    .toggle-target {
+      transition: max-height 0.3s ease;
+      overflow: hidden;
+    }
+    
     /* ===== PRINT STYLES (one-page) ===== */
     @media print {
-      @page{size:letter portrait;margin:0.3in;}
-      html,body{width:100%;height:100%;margin:0;padding:0;
-                font-size:10px;line-height:1.2;zoom:0.75;}
-      .no-print,.remove-section{display:none!important;}
-      .form-container{border:none;padding:0;margin:0;}
-      table{font-size:9px;margin-bottom:4px;}
-      th,td{padding:3px;}
-      label,th,td,input,select,textarea{font-size:9px!important;}
-      .section-title{font-size:12px!important;margin:6px 0 4px!important;padding-bottom:2px!important;}
-      .subsection-title{font-size:11px!important;margin:4px 0 2px!important;}
-      .input-group,.checkbox-group,.section{margin-bottom:4px!important;padding:4px!important;}
-      .counter-group input{width:40px!important;}
-      textarea{height:50px!important;}
-      .section{page-break-inside:avoid;}
-      
+      @page {
+        size: letter portrait;
+        margin: 0.3in;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-size: 10px;
+        line-height: 1.2;
+        zoom: 0.75;
+      }
+      .no-print,
+      .remove-section,
+      .btn-toggle {
+        display: none !important;
+      }
+      .form-container {
+        border: none;
+        padding: 0;
+        margin: 0;
+      }
+      table {
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+      th, td {
+        padding: 3px;
+      }
+      label,
+      th,
+      td,
+      input,
+      select,
+      textarea {
+        font-size: 9px !important;
+      }
+      .section-title {
+        font-size: 12px !important;
+        margin: 6px 0 4px !important;
+        padding-bottom: 2px !important;
+      }
+      .subsection-title {
+        font-size: 11px !important;
+        margin: 4px 0 2px !important;
+      }
+      .input-group,
+      .checkbox-group,
+      .section {
+        margin-bottom: 4px !important;
+        padding: 4px !important;
+      }
+      .counter-group input {
+        width: 40px !important;
+      }
+      textarea {
+        height: 50px !important;
+      }
+      .section {
+        page-break-inside: avoid;
+      }
       /* Optimized table layout */
-      td input, td select, td textarea {
+      td input,
+      td select,
+      td textarea {
         width: 100% !important;
         padding: 2px !important;
       }
-
       .checkbox-item label {
         margin-left: 2px;
       }
@@ -63,7 +223,6 @@
   </style>
 </head>
 <body>
-
   <div class="form-container" id="form-root" role="form" aria-label="Concrete Job Form">
     <!-- HEADER -->
     <div class="header">
@@ -110,11 +269,18 @@
           <tr>
             <td>
               <div class="counter-group">
-                <input type="number" step="100" min="0" placeholder="" aria-label="Length in feet" oninput="validateNonNegative(this)" />
+                <input type="number" step="100" min="0" placeholder=""
+                  aria-label="Length in feet" oninput="validateNonNegative(this)" />
               </div>
             </td>
-            <td><input type="number" step="6" min="0" placeholder="" aria-label="Width in inches" oninput="validateNonNegative(this)" /></td>
-            <td><input type="number" step="6" min="0" placeholder="" aria-label="Depth in inches" oninput="validateNonNegative(this)" /></td>
+            <td>
+              <input type="number" step="6" min="0" placeholder=""
+                aria-label="Width in inches" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="number" step="6" min="0" placeholder=""
+                aria-label="Depth in inches" oninput="validateNonNegative(this)" />
+            </td>
           </tr>
         </table>
 
@@ -126,8 +292,14 @@
           </tr>
           <tr>
             <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0" placeholder="" aria-label="Uprights Quantity" oninput="validateNonNegative(this)" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Uprights Length in feet" oninput="validateNonNegative(this)" /></td>
+            <td>
+              <input type="number" step="5" min="0" placeholder=""
+                aria-label="Uprights Quantity" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="number" step="1" min="0" placeholder=""
+                aria-label="Uprights Length in feet" oninput="validateNonNegative(this)" />
+            </td>
           </tr>
         </table>
 
@@ -139,12 +311,18 @@
           </tr>
           <tr>
             <td style="width:120px;">Quantity / Cantidad</td>
-            <td><input type="number" step="5" min="0" placeholder="" aria-label="Crossbars Quantity" oninput="validateNonNegative(this)" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Crossbars Length in feet" oninput="validateNonNegative(this)" /></td>
+            <td>
+              <input type="number" step="5" min="0" placeholder=""
+                aria-label="Crossbars Quantity" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="number" step="1" min="0" placeholder=""
+                aria-label="Crossbars Length in feet" oninput="validateNonNegative(this)" />
+            </td>
           </tr>
         </table>
 
-        <!-- Single / Double Mat -->
+        <!-- Mat Selection -->
         <div class="checkbox-group" role="group" aria-label="Mat Selection Single or Double">
           <div class="checkbox-item">
             <input id="single-mat-1" name="mat-type-1" type="radio" aria-label="Single Mat / Malla Simple" />
@@ -165,7 +343,8 @@
           <tr>
             <td>
               <div class="counter-group">
-                <input type="number" step="10" min="0" placeholder="" aria-label="Rebar Quantity" oninput="validateNonNegative(this)" />
+                <input type="number" step="10" min="0" placeholder=""
+                  aria-label="Rebar Quantity" oninput="validateNonNegative(this)" />
               </div>
             </td>
             <td>
@@ -192,8 +371,14 @@
           </tr>
           <tr>
             <td></td>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Bulkheads Quantity" oninput="validateNonNegative(this)" /></td>
-            <td><input type="number" step="0.01" min="0" placeholder="" aria-label="Bulkheads Height" oninput="validateNonNegative(this)" /></td>
+            <td>
+              <input type="number" step="1" min="0" placeholder=""
+                aria-label="Bulkheads Quantity" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="number" step="0.01" min="0" placeholder=""
+                aria-label="Bulkheads Height" oninput="validateNonNegative(this)" />
+            </td>
           </tr>
         </table>
 
@@ -205,43 +390,32 @@
             <th>Custom / Pers.</th>
           </tr>
           <tr>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Piers Quantity" oninput="validateNonNegative(this)" /></td>
             <td>
-              <select
-                id="piersize-1"
-                aria-label="Pier Size"
-                onchange="toggleCustomSize(this)"
-              >
+              <input type="number" step="1" min="0" placeholder=""
+                aria-label="Piers Quantity" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <select id="piersize-1" aria-label="Pier Size" onchange="toggleCustomSize(this)">
                 <option value="">Select Size</option>
                 <option>2' x 2' x 12"</option>
                 <option>3' x 3' x 12"</option>
               </select>
             </td>
             <td class="checkbox-item">
-              <input
-                type="checkbox"
-                id="piercustom-1"
-                aria-label="Custom Size / Tamaño Pers."
-                onchange="enableCustomInput(this)"
-              />
+              <input type="checkbox" id="piercustom-1" aria-label="Custom Size / Tamaño Pers." onchange="enableCustomInput(this)" />
               <label for="piercustom-1">Custom Size / Tamaño Pers.</label>
-              <input
-                type="text"
-                id="piercustominput-1"
-                disabled
-                style="width:120px"
-                placeholder=""
-                aria-label="Custom Pier Size Input"
-              />
+              <input type="text" id="piercustominput-1" disabled style="width:120px" placeholder="" aria-label="Custom Pier Size Input" />
             </td>
           </tr>
         </table>
 
         <!-- Fireplace & Porch Pad -->
         <div class="subsection-title">Fireplace / Chimenea</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Fireplace or Chimenea" />
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder=""
+          aria-label="Fireplace or Chimenea" />
         <div class="subsection-title">Porch Pad / Base Porche</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Porch Pad or Base Porche" />
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder=""
+          aria-label="Porch Pad or Base Porche" />
 
         <!-- Additional Materials -->
         <div class="subsection-title">Additional Materials / Materiales Ad.</div>
@@ -255,18 +429,34 @@
             <td>
               <input type="text" placeholder="" aria-label="Additional Material Item 1" />
             </td>
-            <td><input type="number" step="2" min="0" placeholder="" aria-label="Additional Material Quantity 1" oninput="validateNonNegative(this)" /></td>
-            <td><input type="text" placeholder="" aria-label="Additional Material Notes 1" /></td>
+            <td>
+              <input type="number" step="2" min="0" placeholder="" aria-label="Additional Material Quantity 1" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="text" placeholder="" aria-label="Additional Material Notes 1" />
+            </td>
           </tr>
           <tr>
-            <td><input type="text" placeholder="" aria-label="Additional Material Item 2" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 2" oninput="validateNonNegative(this)" /></td>
-            <td><input type="text" placeholder="" aria-label="Additional Material Notes 2" /></td>
+            <td>
+              <input type="text" placeholder="" aria-label="Additional Material Item 2" />
+            </td>
+            <td>
+              <input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 2" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="text" placeholder="" aria-label="Additional Material Notes 2" />
+            </td>
           </tr>
           <tr>
-            <td><input type="text" placeholder="" aria-label="Additional Material Item 3" /></td>
-            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 3" oninput="validateNonNegative(this)" /></td>
-            <td><input type="text" placeholder="" aria-label="Additional Material Notes 3" /></td>
+            <td>
+              <input type="text" placeholder="" aria-label="Additional Material Item 3" />
+            </td>
+            <td>
+              <input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 3" oninput="validateNonNegative(this)" />
+            </td>
+            <td>
+              <input type="text" placeholder="" aria-label="Additional Material Notes 3" />
+            </td>
           </tr>
         </table>
 
@@ -284,42 +474,24 @@
       Number of Sections / Número de Secciones:
     </div>
     <div class="checkbox-group" id="section-count-group" role="radiogroup" aria-label="Number of Sections">
-      <!-- checkboxes generated by script -->
+      <!-- Section count radios generated by script -->
     </div>
 
     <!-- CONCRETE INFO -->
     <div class="section-title" aria-level="2" role="heading">Concrete Info / Info de Concreto</div>
     <div class="checkbox-group" role="radiogroup" aria-label="Concrete Company">
       <div class="checkbox-item">
-        <input
-          id="imi"
-          name="concrete-company"
-          type="radio"
-          onclick="updateConcreteCompany('imi')"
-          aria-label="IMI Concrete Company"
-        />
+        <input id="imi" name="concrete-company" type="radio" onclick="updateConcreteCompany('imi')" aria-label="IMI Concrete Company" />
         <label for="imi">IMI</label>
       </div>
       <div class="checkbox-item">
-        <input
-          id="srm"
-          name="concrete-company"
-          type="radio"
-          onclick="updateConcreteCompany('srm')"
-          aria-label="SRM Concrete Company"
-        />
+        <input id="srm" name="concrete-company" type="radio" onclick="updateConcreteCompany('srm')" aria-label="SRM Concrete Company" />
         <label for="srm">SRM</label>
       </div>
       <div class="input-group" style="flex:1;">
         <label for="other-company">Other / Otro:</label>
-        <input
-          id="other-company"
-          class="input-field"
-          type="text"
-          oninput="updateConcreteCompany('other')"
-          placeholder=""
-          aria-label="Other Concrete Company"
-        />
+        <input id="other-company" class="input-field" type="text" oninput="updateConcreteCompany('other')" placeholder=""
+          aria-label="Other Concrete Company" />
       </div>
     </div>
     <table>
@@ -341,16 +513,11 @@
       </tr>
       <tr>
         <td>
-          <input
-            id="additives"
-            class="input-field"
-            type="text"
-            style="width:100%"
-            placeholder=""
-            aria-label="Additives"
-          />
+          <input id="additives" class="input-field" type="text" style="width:100%" placeholder="" aria-label="Additives" />
         </td>
-        <td><input id="strength" type="number" step="500" min="3000" placeholder="" aria-label="Strength PSI" oninput="validateMinValue(this,3000)" /></td>
+        <td>
+          <input id="strength" type="number" step="500" min="3000" placeholder="" aria-label="Strength PSI" oninput="validateMinValue(this,3000)" />
+        </td>
       </tr>
     </table>
 
@@ -358,88 +525,52 @@
     <div class="section-title" aria-level="2" role="heading">Pump Co. / Empresa Bomba</div>
     <div class="checkbox-group" role="radiogroup" aria-label="Pump Company">
       <div class="checkbox-item">
-        <input
-          id="pump-cpp"
-          name="pump-company"
-          type="radio"
-          onclick="updatePumpCompany('cpp')"
-          aria-label="CPP Pump Company"
-        />
+        <input id="pump-cpp" name="pump-company" type="radio" onclick="updatePumpCompany('cpp')" aria-label="CPP Pump Company" />
         <label for="pump-cpp">CPP</label>
       </div>
       <div class="checkbox-item">
-        <input
-          id="pump-brundage"
-          name="pump-company"
-          type="radio"
-          onclick="updatePumpCompany('brundage')"
-          aria-label="Brundage Pump Company"
-        />
+        <input id="pump-brundage" name="pump-company" type="radio" onclick="updatePumpCompany('brundage')" aria-label="Brundage Pump Company" />
         <label for="pump-brundage">Brundage</label>
       </div>
       <div class="input-group" style="flex:1;">
         <label for="pump-other">Other / Otro:</label>
-        <input
-          id="pump-other"
-          class="input-field"
-          type="text"
-          oninput="updatePumpCompany('other')"
-          placeholder=""
-          aria-label="Other Pump Company"
-        />
+        <input id="pump-other" class="input-field" type="text" oninput="updatePumpCompany('other')" placeholder="" aria-label="Other Pump Company" />
       </div>
     </div>
 
-    <!-- CREW INFO -->
-    <div class="section-title" aria-level="2" role="heading">Crew Info / Info del Equipo</div>
-    <table id="crew-table" aria-label="Crew Information">
-      <tr>
-        <th>Name / Nombre</th>
-        <th>Role / Rol</th>
-        <th>Hours / Horas</th>
-      </tr>
-      <tr>
-        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
-        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
-        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
-      </tr>
-      <tr>
-        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
-        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
-        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
-      </tr>
-      <tr>
-        <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
-        <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
-        <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
-      </tr>
-    </table>
-    <button class="btn btn-blue no-print" onclick="addCrewMember()" type="button" aria-label="Add Crew Member">
-      Add Crew Member / Agregar Miembro
-    </button>
+    <!-- CREW INFO (Toggleable) -->
+    <div class="section-title" aria-level="2" role="heading">
+      Crew Info / Info del Equipo
+      <button class="btn btn-toggle no-print" data-target="crew-section" type="button">Hide</button>
+    </div>
+    <div id="crew-section" class="toggle-target">
+      <table id="crew-table" aria-label="Crew Information">
+        <tr>
+          <th>Name / Nombre</th>
+          <th>Role / Rol</th>
+          <th>Hours / Horas</th>
+        </tr>
+        <tr>
+          <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+          <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+          <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
+        </tr>
+        <tr>
+          <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+          <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+          <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
+        </tr>
+        <tr>
+          <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
+          <td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>
+          <td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>
+        </tr>
+      </table>
+      <button class="btn btn-blue no-print" onclick="addCrewMember()" type="button" aria-label="Add Crew Member">
+        Add Crew Member / Agregar Miembro
+      </button>
+    </div>
 
-    <!-- EQUIPMENT USED -->
-    <div class="section-title" aria-level="2" role="heading">Equipment Used / Equipo Usado</div>
-    <table id="equipment-table" aria-label="Equipment Used">
-      <tr>
-        <th>Equipment / Equipo</th>
-        <th>Hours / Horas</th>
-        <th>Notes / Notas</th>
-      </tr>
-      <tr>
-        <td><input type="text" placeholder="" aria-label="Equipment Name" /></td>
-        <td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>
-        <td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>
-      </tr>
-      <tr>
-        <td><input type="text" placeholder="" aria-label="Equipment Name" /></td>
-        <td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>
-        <td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>
-      </tr>
-    </table>
-    <button class="btn btn-blue no-print" onclick="addEquipmentRow()" type="button" aria-label="Add Equipment">
-      Add Equipment / Agregar Equipo
-    </button>
 
     <!-- EQUIP HRS / DESC -->
     <div class="section-title" aria-level="2" role="heading">Equipment Hours & Description / Horas y Descripción</div>
@@ -507,38 +638,48 @@
       </tr>
     </table>
 
-    <!-- MANAGEMENT JOB CODING -->
-    <div class="section-title" aria-level="2" role="heading">Management Job Coding / Cod. Gestión</div>
-    <div class="input-group">
-      <label for="builder">Builder / Constructor:</label>
-      <input id="builder" class="input-field" type="text" placeholder="" aria-label="Builder or Constructor" />
+    <!-- MANAGEMENT JOB CODING (Toggleable) -->
+    <div class="section-title" aria-level="2" role="heading">
+      Management Job Coding / Cod. Gestión
+      <button class="btn btn-toggle no-print" data-target="coding-section" type="button">Hide</button>
     </div>
-    <div class="input-group">
-      <label for="city-county">City/County / Ciudad:</label>
-      <input id="city-county" class="input-field" type="text" placeholder="" aria-label="City or County" />
-    </div>
-    <div class="checkbox-group" role="group" aria-label="Job Type">
-      <div class="checkbox-item">
-        <input id="job-turnkey" type="checkbox" aria-label="Turnkey Job" />
-        <label for="job-turnkey">Turnkey / Llave Mano</label>
+    <div id="coding-section" class="toggle-target">
+      <div class="input-group">
+        <label for="builder">Builder / Constructor:</label>
+        <input id="builder" class="input-field" type="text" placeholder="" aria-label="Builder or Constructor" />
       </div>
-      <div class="checkbox-item">
-        <input id="job-house" type="checkbox" aria-label="House Job" />
-        <label for="job-house">House / Casa</label>
+      <div class="input-group">
+        <label for="city-county">City/County / Ciudad:</label>
+        <input id="city-county" class="input-field" type="text" placeholder="" aria-label="City or County" />
       </div>
-      <div class="checkbox-item">
-        <input id="job-labor" type="checkbox" aria-label="Labor Only Job" />
-        <label for="job-labor">Labor Only / Solo O.</label>
-      </div>
-      <div class="checkbox-item">
-        <input id="job-retaining" type="checkbox" aria-label="Retaining Wall Job" />
-        <label for="job-retaining">Retaining Wall / Muro</label>
+      <div class="checkbox-group" role="group" aria-label="Job Type">
+        <div class="checkbox-item">
+          <input id="job-turnkey" type="checkbox" aria-label="Turnkey Job" />
+          <label for="job-turnkey">Turnkey / Llave Mano</label>
+        </div>
+        <div class="checkbox-item">
+          <input id="job-house" type="checkbox" aria-label="House Job" />
+          <label for="job-house">House / Casa</label>
+        </div>
+        <div class="checkbox-item">
+          <input id="job-labor" type="checkbox" aria-label="Labor Only Job" />
+          <label for="job-labor">Labor Only / Solo O.</label>
+        </div>
+        <div class="checkbox-item">
+          <input id="job-retaining" type="checkbox" aria-label="Retaining Wall Job" />
+          <label for="job-retaining">Retaining Wall / Muro</label>
+        </div>
       </div>
     </div>
 
-    <!-- ADDITIONAL NOTES -->
-    <div class="section-title" aria-level="2" role="heading">Additional Notes / Notas Adicionales</div>
-    <textarea id="additional-notes" placeholder="" aria-label="Additional Notes"></textarea>
+    <!-- ADDITIONAL NOTES (Toggleable) -->
+    <div class="section-title" aria-level="2" role="heading">
+      Additional Notes / Notas Adicionales
+      <button class="btn btn-toggle no-print" data-target="notes-section" type="button">Hide</button>
+    </div>
+    <div id="notes-section" class="toggle-target">
+      <textarea id="additional-notes" placeholder="" aria-label="Additional Notes"></textarea>
+    </div>
 
     <!-- SAVE AS PDF -->
     <button class="btn btn-green no-print" onclick="savePDF()" type="button" aria-label="Save form as PDF">
@@ -546,18 +687,17 @@
     </button>
   </div>
 
+  <!-- html2pdf bundle -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     // Set today's date
     document.getElementById('date').value = new Date().toLocaleDateString();
 
-    // Enter key navigation (skip textarea)
+    // Enter key navigation (skipping textarea)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();
-        const fields = [
-          ...document.querySelectorAll('input:not([type=checkbox]), select, textarea'),
-        ].filter((el) => el.offsetParent);
+        const fields = [...document.querySelectorAll('input:not([type=checkbox]), select, textarea')].filter((el) => el.offsetParent);
         const idx = fields.indexOf(document.activeElement);
         (fields[idx + 1] || fields[0]).focus();
       }
@@ -569,92 +709,106 @@
         input.value = '';
       }
     }
-    // Validate minimum value for inputs like strength psi
+    // Validate minimum value for inputs such as strength psi
     function validateMinValue(input, min) {
       if (input.value !== '' && Number(input.value) < min) {
         input.value = '';
       }
     }
 
-    // Fixed PDF saving function with improved cleanup and error handling
-function savePDF() {
-  // Hide non-printable elements
-  const ui = document.querySelectorAll('.no-print');
-  ui.forEach((el) => (el.style.display = 'none'));
-
-  const element = document.getElementById('form-root');
-
-  // Clone the element to preserve original styles
-  const clone = element.cloneNode(true);
-  clone.style.width = '100%';
-  clone.style.overflow = 'visible';
-  document.body.appendChild(clone);
-
-  // Inject print-safe styles to the clone
-  const style = document.createElement('style');
-  style.textContent = `
-    input, select, textarea {
-      background-color: #fff !important;
-      color: #000 !important;
-      border: 1px solid #ccc !important;
-      box-shadow: none !important;
-    }
-    .input-field {
-      background-color: #fff !important;
-      border: 1px solid #ccc !important;
-    }
-    * {
-      margin-bottom: 2px !important;
-      padding: 2px !important;
-      line-height: 1.1 !important;
-      font-size: 9px !important;
-    }
-  `;
-  clone.appendChild(style);
-
-  const opt = {
-    margin: 0.2,
-    filename: 'concrete_job_form.pdf',
-    pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
-    html2canvas: {
-      scale: 2, // Higher scale for better quality
-      useCORS: true,
-      scrollY: 0,
-      windowHeight: clone.scrollHeight
-    },
-    jsPDF: {
-      unit: 'in',
-      format: 'letter',
-      orientation: 'portrait',
-      hotfixes: ['px_scaling'] // Fixes pixel scaling issues
-    }
-  };
-
-  // Generate PDF
-  html2pdf()
-    .set(opt)
-    .from(clone)
-    .save()
-    .then(() => {
-      // Clean up and restore UI
-      document.body.removeChild(clone);
-      ui.forEach((el) => (el.style.display = ''));
-    })
-    .catch(err => {
-      console.error('PDF generation failed:', err);
-      if (document.body.contains(clone)) {
-        document.body.removeChild(clone);
+    // --- TOGGLE SECTIONS ---
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.btn-toggle')) {
+        const btn = e.target;
+        const target = document.getElementById(btn.getAttribute('data-target'));
+        if (target) {
+          if (target.style.display === 'none') {
+            target.style.display = '';
+            btn.textContent = 'Hide';
+          } else {
+            target.style.display = 'none';
+            btn.textContent = 'Show';
+          }
+        }
       }
-      ui.forEach((el) => (el.style.display = ''));
-      alert('Failed to generate PDF. Please try again.');
     });
-}
 
+    // --- SAVE PDF ---
+    function savePDF() {
+      // Hide non-printable elements
+      const ui = document.querySelectorAll('.no-print');
+      ui.forEach((el) => (el.style.display = 'none'));
 
-    // Dynamic Sections
+      const element = document.getElementById('form-root');
+
+      // Clone element to preserve original styles
+      const clone = element.cloneNode(true);
+      clone.style.width = '100%';
+      clone.style.overflow = 'visible';
+      document.body.appendChild(clone);
+
+      // Inject print-safe styles into clone
+      const style = document.createElement('style');
+      style.textContent = `
+        input, select, textarea {
+          background-color: #fff !important;
+          color: #000 !important;
+          border: 1px solid #ccc !important;
+          box-shadow: none !important;
+        }
+        .input-field {
+          background-color: #fff !important;
+          border: 1px solid #ccc !important;
+        }
+        * {
+          margin-bottom: 2px !important;
+          padding: 2px !important;
+          line-height: 1.1 !important;
+          font-size: 9px !important;
+        }
+      `;
+      clone.appendChild(style);
+
+      const opt = {
+        margin: 0.2,
+        filename: 'concrete_job_form.pdf',
+        pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollY: 0,
+          windowHeight: clone.scrollHeight
+        },
+        jsPDF: {
+          unit: 'in',
+          format: 'letter',
+          orientation: 'portrait',
+          hotfixes: ['px_scaling']
+        }
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(clone)
+        .save()
+        .then(() => {
+          document.body.removeChild(clone);
+          ui.forEach((el) => (el.style.display = ''));
+        })
+        .catch((err) => {
+          console.error('PDF generation failed:', err);
+          if (document.body.contains(clone)) {
+            document.body.removeChild(clone);
+          }
+          ui.forEach((el) => (el.style.display = ''));
+          alert('Failed to generate PDF. Please try again.');
+        });
+    }
+
+    // --- DYNAMIC SECTIONS (as in the original) ---
     let sectionCount = 1;
 
-    // Generate section count radio buttons for accessibility and single selection
+    // Generate radio buttons showing the current section count
     function updateSectionCountRadios() {
       const container = document.getElementById('section-count-group');
       container.innerHTML = '';
@@ -682,6 +836,7 @@ function savePDF() {
       }
     }
 
+    // Add a new footing section
     function addSection() {
       sectionCount++;
       const t = document.getElementById('section-1').cloneNode(true);
@@ -691,26 +846,26 @@ function savePDF() {
         else el.value = '';
         if (el.tagName === 'SELECT') el.selectedIndex = 0;
       });
+      // Update IDs for mat and pier inputs to avoid duplicates in the clone
       ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
         (pref) => {
           const el = t.querySelector('[id^="' + pref + '"]');
           if (el) {
             el.id = pref + sectionCount;
             if (el.type === 'radio') {
-              el.name = 'mat-type-' + sectionCount; // update radio group name
+              el.name = 'mat-type-' + sectionCount;
             }
             const lbl = t.querySelector('label[for^="' + pref + '"]');
             if (lbl) lbl.htmlFor = el.id;
           }
         }
       );
-      t.querySelector('.section-title').textContent =
-        'Footing Section / Sección de Cimentación ' + sectionCount;
+      t.querySelector('.section-title').textContent = 'Footing Section / Sección de Cimentación ' + sectionCount;
 
-      // Update aria-labels on remove button and others in the cloned section
+      // Update aria-label on remove button
       const removeBtn = t.querySelector('.remove-section');
       removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
-
+      
       // Update section title aria attributes
       const sectionTitle = t.querySelector('.section-title');
       sectionTitle.id = 'section-title-' + sectionCount;
@@ -719,6 +874,7 @@ function savePDF() {
       updateSectionCountRadios();
     }
 
+    // Remove a footing section (ensure at least one remains)
     function removeSection(sec) {
       const all = [...document.querySelectorAll('#sections-container .section')];
       if (all.length === 1) {
@@ -730,21 +886,17 @@ function savePDF() {
       renumber();
     }
 
+    // Renumber sections after removal
     function renumber() {
       sectionCount = 0;
       document.querySelectorAll('#sections-container .section').forEach((s, i) => {
         sectionCount = i + 1;
         s.id = 'section-' + sectionCount;
-        s.querySelector('.section-title').textContent =
-          'Footing Section / Sección de Cimentación ' + sectionCount;
-
-        // Update aria-label on remove button
+        s.querySelector('.section-title').textContent = 'Footing Section / Sección de Cimentación ' + sectionCount;
         const removeBtn = s.querySelector('.remove-section');
         if (removeBtn) {
           removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
         }
-
-        // Update IDs and labels for mat radios and pier inputs
         ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
           (pref) => {
             const el = s.querySelector('[id^="' + pref + '"]');
@@ -758,8 +910,6 @@ function savePDF() {
             }
           }
         );
-
-        // Update section title aria attributes
         const sectionTitle = s.querySelector('.section-title');
         sectionTitle.id = 'section-title-' + sectionCount;
       });
@@ -772,14 +922,14 @@ function savePDF() {
       if (radio) radio.checked = true;
       while (sectionCount < n) addSection();
       while (sectionCount > n) {
-        if (sectionCount === 1) break; // never remove last
+        if (sectionCount === 1) break;
         document.querySelector('#sections-container .section:last-child').remove();
         sectionCount--;
       }
       updateSectionCountRadios();
     }
 
-    // Custom pier size
+    // Custom pier size helpers
     function enableCustomInput(cb) {
       const i = cb.id.split('-')[1];
       const inp = document.getElementById('piercustominput-' + i);
@@ -795,26 +945,28 @@ function savePDF() {
       inp.value = '';
     }
 
-    // Crew & Equipment rows
+    // Crew & Equipment rows helpers
     function addCrewMember() {
       const r = document.getElementById('crew-table').insertRow(-1);
-      r.innerHTML =
-        '<td><input type="text" placeholder="" aria-label="Crew Member Name" /></td><td><input type="text" placeholder="" aria-label="Crew Member Role" /></td><td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>';
+      r.innerHTML = '<td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>' +
+                    '<td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>' +
+                    '<td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>';
     }
     function addEquipmentRow() {
       const r = document.getElementById('equipment-table').insertRow(-1);
-      r.innerHTML =
-        '<td><input type="text" placeholder="" aria-label="Equipment Name" /></td><td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td><td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>';
+      r.innerHTML = '<td><input type="text" placeholder="" aria-label="Equipment Name" /></td>' +
+                    '<td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>' +
+                    '<td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>';
     }
 
-    // Single-select helpers for concrete company radios
+    // Single-select helpers for concrete company
     function updateConcreteCompany(c) {
       if (c === 'imi' || c === 'srm') {
         document.getElementById(c).checked = true;
         document.getElementById('other-company').value = '';
       }
     }
-    // Single-select helpers for pump company radios
+    // Single-select helpers for pump company
     function updatePumpCompany(c) {
       if (c === 'cpp' || c === 'brundage') {
         document.getElementById('pump-' + c).checked = true;
