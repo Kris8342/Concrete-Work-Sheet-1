@@ -23,7 +23,6 @@
       flex-wrap: wrap;
       gap: 20px;
       margin-bottom: 18px;
-      /* Prevent header break */
       page-break-inside: avoid;
     }
     .input-group {
@@ -65,7 +64,7 @@
     }
     th, td {
       border: 1px solid #ddd;
-      padding: 2px;
+      padding: 4px;
       text-align: left;
       vertical-align: top;
     }
@@ -125,63 +124,127 @@
       cursor: pointer;
       margin: 10px 10px 0 0;
     }
-    .btn-green {
-      background: #4caf50;
-    }
-    .btn-blue {
-      background: #2196f3;
-    }
+    .btn-green { background: #4caf50; }
+    .btn-blue  { background: #2196f3; }
     .btn-toggle {
       background: #607d8b;
       padding: 6px 10px;
       font-size: 13px;
     }
-    .no-print {
-      display: inline-block;
-    }
-    /* Wrap toggle-able sections */
+    .no-print { display: inline-block; }
     .toggle-target {
       transition: max-height 0.3s ease;
       overflow: hidden;
     }
-    
-    /* ===== PRINT STYLES (one-page) ===== */
-@media print {
-  .header {
-    margin-bottom: 4px !important;
-    gap: 4px !important;
-    flex-direction: column !important;
-    page-break-inside: avoid;
-    page-break-after: avoid;
-  }
-  .input-group {
-    margin-bottom: 2px !important;
-    display: block !important;
-  }
-  .input-field {
-    width: 100px !important;
-  }
-}
 
-      .counter-group input {
-        width: 40px !important;
-      }
-      textarea {
-        height: 50px !important;
-      }
-      .section {
+    /* ===== RETAINING WALL TOGGLE BANNER ===== */
+    .rw-toggle-banner {
+      background: #fff8e1;
+      border: 2px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 10px 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .rw-toggle-banner input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .rw-toggle-banner label {
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .rw-toggle-banner .hint {
+      font-weight: normal;
+      color: #555;
+      font-size: 13px;
+      margin-left: auto;
+    }
+
+    /* Calculated output pill */
+    .calc-output {
+      display: inline-block;
+      background: #e8f5e9;
+      border: 1px solid #4caf50;
+      border-radius: 4px;
+      padding: 3px 10px;
+      color: #2e7d32;
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+    .calc-output.calc-output-warn {
+      background: #fff3e0;
+      border-color: #ff9800;
+      color: #e65100;
+    }
+    .calc-output.calc-output-info {
+      background: #e3f2fd;
+      border-color: #2196f3;
+      color: #0d47a1;
+    }
+
+    /* Rebar size badge */
+    .rebar-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      background: #2196f3;
+      color: white;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .info-note {
+      background: #fff8e1;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #6d4c00;
+      margin: 10px 0 15px;
+    }
+
+    .rw-summary-section {
+      background: #f0f7ff;
+      border: 1px solid #90caf9;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 15px;
+    }
+
+    .rw-active .section-title {
+      color: #b8860b;
+    }
+
+    /* ===== PRINT STYLES (one-page) ===== */
+    @media print {
+      .header {
+        margin-bottom: 4px !important;
+        gap: 4px !important;
+        flex-direction: column !important;
         page-break-inside: avoid;
+        page-break-after: avoid;
       }
-      /* Optimized table layout */
+      .input-group {
+        margin-bottom: 2px !important;
+        display: block !important;
+      }
+      .input-field { width: 100px !important; }
+      .counter-group input { width: 40px !important; }
+      textarea { height: 50px !important; }
+      .section { page-break-inside: avoid; }
       td input,
       td select,
       td textarea {
         width: 100% !important;
         padding: 2px !important;
       }
-      .checkbox-item label {
-        margin-left: 2px;
-      }
+      .checkbox-item label { margin-left: 2px; }
     }
   </style>
 </head>
@@ -190,20 +253,20 @@
     <!-- HEADER -->
     <div class="header">
       <div class="input-group">
-        <label for="name">Name / Nombre:</label>
-        <input id="name" class="input-field" type="text" placeholder="" aria-label="Name or Nombre" />
+        <label for="name">Name:</label>
+        <input id="name" class="input-field" type="text" placeholder="" aria-label="Name" />
       </div>
       <div class="input-group">
-        <label for="date">Date Poured / Fecha Vaciado:</label>
-        <input id="date" class="input-field" type="text" placeholder="" aria-label="Date Poured or Fecha Vaciado" />
+        <label for="date">Date Poured:</label>
+        <input id="date" class="input-field" type="text" placeholder="" aria-label="Date Poured" />
       </div>
       <div class="input-group" style="flex:1 1 100%;">
-        <label for="address">Job Address / Dirección del Trabajo:</label>
-        <input id="address" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Job Address or Dirección del Trabajo" />
+        <label for="address">Job Address:</label>
+        <input id="address" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Job Address" />
       </div>
       <div class="input-group" style="flex:1 1 100%;">
-        <label for="customer">Customer / Cliente:</label>
-        <input id="customer" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Customer or Cliente" />
+        <label for="customer">Customer:</label>
+        <input id="customer" class="input-field" style="width:400px" type="text" placeholder="" aria-label="Customer" />
       </div>
     </div>
 
@@ -215,30 +278,36 @@
           onclick="removeSection(this.parentNode)"
           aria-label="Remove Footing Section 1"
           type="button"
-        >
-          Remove
-        </button>
+        >Remove</button>
         <div class="section-title" id="section-title-1" aria-level="2" role="heading">
-          Footing Section / Sección de Cimentación 1
+          Footing Section 1
         </div>
 
-        <!-- Length / Width / Depth -->
+        <!-- RETAINING WALL TOGGLE -->
+        <div class="rw-toggle-banner no-print">
+          <input type="checkbox" id="retaining-wall-toggle-1" onchange="toggleRetainingWall(this)" />
+          <label for="retaining-wall-toggle-1"><strong>Retaining Wall</strong> &mdash; use rebar calculator</label>
+          <span class="hint">Calc reads Length &amp; Width from Footer Dimensions below</span>
+        </div>
+
+        <!-- FOOTER DIMENSIONS (shared between modes) -->
+        <div class="subsection-title">Footer Dimensions</div>
         <table>
           <tr>
-            <th>Length (ft) / Largo (pies)</th>
-            <th>Width (in) / Ancho (pulg)</th>
-            <th>Depth (in) / Profundidad (pulg)</th>
+            <th>Length (ft)</th>
+            <th>Width (in)</th>
+            <th>Depth (in)</th>
           </tr>
           <tr>
             <td>
               <div class="counter-group">
-                <input type="number" step="100" min="0" placeholder=""
-                  aria-label="Length in feet" oninput="validateNonNegative(this)" />
+                <input type="number" data-footer-dim="length-ft" step="1" min="0" placeholder=""
+                  aria-label="Length in feet" oninput="onDimensionInput(this)" />
               </div>
             </td>
             <td>
-              <input type="number" step="6" min="0" placeholder=""
-                aria-label="Width in inches" oninput="validateNonNegative(this)" />
+              <input type="number" data-footer-dim="width-in" step="6" min="0" placeholder=""
+                aria-label="Width in inches" oninput="onDimensionInput(this)" />
             </td>
             <td>
               <input type="number" step="6" min="0" placeholder=""
@@ -247,90 +316,315 @@
           </tr>
         </table>
 
-        <!-- Uprights -->
-        <table>
-          <tr>
-            <th colspan="2">Uprights / Verticales</th>
-            <th>Length (ft) / Largo (pies)</th>
-          </tr>
-          <tr>
-            <td style="width:120px;">Quantity / Cantidad</td>
-            <td>
-              <input type="number" step="5" min="0" placeholder=""
-                aria-label="Uprights Quantity" oninput="validateNonNegative(this)" />
-            </td>
-            <td>
-              <input type="number" step="1" min="0" placeholder=""
-                aria-label="Uprights Length in feet" oninput="validateNonNegative(this)" />
-            </td>
-          </tr>
-        </table>
+        <!-- ===== STANDARD FOOTING CONTENT ===== -->
+        <div class="standard-footing-content">
 
-        <!-- Crossbars -->
-        <table>
-          <tr>
-            <th colspan="2">Crossbars / Travesaños</th>
-            <th>Length (ft) / Largo (pies)</th>
-          </tr>
-          <tr>
-            <td style="width:120px;">Quantity / Cantidad</td>
-            <td>
-              <input type="number" step="5" min="0" placeholder=""
-                aria-label="Crossbars Quantity" oninput="validateNonNegative(this)" />
-            </td>
-            <td>
-              <input type="number" step="1" min="0" placeholder=""
-                aria-label="Crossbars Length in feet" oninput="validateNonNegative(this)" />
-            </td>
-          </tr>
-        </table>
+          <!-- Uprights -->
+          <table>
+            <tr>
+              <th colspan="2">Uprights</th>
+              <th>Length (ft)</th>
+            </tr>
+            <tr>
+              <td style="width:120px;">Quantity</td>
+              <td>
+                <input type="number" step="5" min="0" placeholder=""
+                  aria-label="Uprights Quantity" oninput="validateNonNegative(this)" />
+              </td>
+              <td>
+                <input type="number" step="1" min="0" placeholder=""
+                  aria-label="Uprights Length in feet" oninput="validateNonNegative(this)" />
+              </td>
+            </tr>
+          </table>
 
-        <!-- Mat Selection -->
-        <div class="checkbox-group" role="group" aria-label="Mat Selection Single or Double">
-          <div class="checkbox-item">
-            <input id="single-mat-1" name="mat-type-1" type="radio" aria-label="Single Mat / Malla Simple" />
-            <label for="single-mat-1">Single Mat / Malla Simple</label>
+          <!-- Crossbars -->
+          <table>
+            <tr>
+              <th colspan="2">Crossbars</th>
+              <th>Length (ft)</th>
+            </tr>
+            <tr>
+              <td style="width:120px;">Quantity</td>
+              <td>
+                <input type="number" step="5" min="0" placeholder=""
+                  aria-label="Crossbars Quantity" oninput="validateNonNegative(this)" />
+              </td>
+              <td>
+                <input type="number" step="1" min="0" placeholder=""
+                  aria-label="Crossbars Length in feet" oninput="validateNonNegative(this)" />
+              </td>
+            </tr>
+          </table>
+
+          <!-- Mat Selection -->
+          <div class="checkbox-group" role="group" aria-label="Mat Selection Single or Double">
+            <div class="checkbox-item">
+              <input id="single-mat-1" name="mat-type-1" type="radio" aria-label="Single Mat" />
+              <label for="single-mat-1">Single Mat</label>
+            </div>
+            <div class="checkbox-item">
+              <input id="double-mat-1" name="mat-type-1" type="radio" aria-label="Double Mat" />
+              <label for="double-mat-1">Double Mat</label>
+            </div>
           </div>
-          <div class="checkbox-item">
-            <input id="double-mat-1" name="mat-type-1" type="radio" aria-label="Double Mat / Malla Doble" />
-            <label for="double-mat-1">Double Mat / Malla Doble</label>
-          </div>
+
+          <!-- Rebar -->
+          <table>
+            <tr>
+              <th>Rebar Qty</th>
+              <th>Size</th>
+            </tr>
+            <tr>
+              <td>
+                <div class="counter-group">
+                  <input type="number" step="10" min="0" placeholder=""
+                    aria-label="Rebar Quantity" oninput="validateNonNegative(this)" />
+                </div>
+              </td>
+              <td>
+                <select aria-label="Rebar Size">
+                  <option value="">Select Size</option>
+                  <option>#4</option>
+                  <option>#5</option>
+                  <option>#6</option>
+                  <option>#7</option>
+                  <option>#8</option>
+                  <option>#9</option>
+                  <option>#10</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+
         </div>
+        <!-- ===== END STANDARD FOOTING CONTENT ===== -->
 
-        <!-- Rebar -->
-        <table>
-          <tr>
-            <th>Rebar Qty / Cant. Varilla</th>
-            <th>Size / Tamaño</th>
-          </tr>
-          <tr>
-            <td>
-              <div class="counter-group">
-                <input type="number" step="10" min="0" placeholder=""
-                  aria-label="Rebar Quantity" oninput="validateNonNegative(this)" />
-              </div>
-            </td>
-            <td>
-              <select aria-label="Rebar Size">
-                <option value="">Select Size</option>
-                <option>#4</option>
-                <option>#5</option>
-                <option>#6</option>
-                <option>#7</option>
-                <option>#8</option>
-                <option>#9</option>
-                <option>#10</option>
-              </select>
-            </td>
-          </tr>
-        </table>
+        <!-- ===== RETAINING WALL CONTENT (hidden by default) ===== -->
+        <div class="retaining-wall-content" style="display:none;">
+
+          <div class="info-note">
+            <strong>Retaining Wall Mode.</strong> Footer Length and Width come from the Footer Dimensions above. For partial feet, enter Length as a decimal (e.g., <code>50.5</code> for 50&prime;&nbsp;6&Prime;).
+          </div>
+
+          <!-- Mat Configuration -->
+          <div class="subsection-title">Mat Configuration</div>
+          <div class="checkbox-group" role="radiogroup" aria-label="Retaining Wall Mat Configuration">
+            <div class="checkbox-item">
+              <input type="radio" id="rw-mat-single-1" name="rw-mat-1" value="1" checked onchange="recalculateRetainingWall(this)" />
+              <label for="rw-mat-single-1">Single (1&times;)</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="radio" id="rw-mat-double-1" name="rw-mat-1" value="2" onchange="recalculateRetainingWall(this)" />
+              <label for="rw-mat-double-1">Double (2&times;)</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="radio" id="rw-mat-triple-1" name="rw-mat-1" value="3" onchange="recalculateRetainingWall(this)" />
+              <label for="rw-mat-triple-1">Triple (3&times;)</label>
+            </div>
+          </div>
+
+          <!-- Cross Bars -->
+          <div class="subsection-title">Cross Bars</div>
+          <table>
+            <tr>
+              <th>Size</th>
+              <th>Spacing (in)</th>
+              <th>Length (each)</th>
+              <th>Qty (per mat)</th>
+            </tr>
+            <tr>
+              <td>
+                <select data-rw-field="crossbar-size" onchange="recalculateRetainingWall(this)" aria-label="Cross Bar Size">
+                  <option value="3">#3 (3/8&Prime;)</option>
+                  <option value="4" selected>#4 (1/2&Prime;)</option>
+                  <option value="5">#5 (5/8&Prime;)</option>
+                  <option value="6">#6 (3/4&Prime;)</option>
+                  <option value="7">#7 (7/8&Prime;)</option>
+                  <option value="8">#8 (1&Prime;)</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" data-rw-field="crossbar-spacing" value="12" min="1" max="48" step="1" oninput="onRwInput(this)" aria-label="Cross Bar Spacing inches" />
+              </td>
+              <td><span class="calc-output" data-rw-output="crossbar-length">&mdash;</span></td>
+              <td><span class="calc-output" data-rw-output="crossbar-qty">&mdash;</span></td>
+            </tr>
+          </table>
+
+          <!-- Horizontal Rebar -->
+          <div class="subsection-title">Horizontal Rebar</div>
+          <table>
+            <tr>
+              <th>Size</th>
+              <th># Bars (per mat)</th>
+              <th>Stick Length (ft)</th>
+              <th>Lap Splice (ft)</th>
+            </tr>
+            <tr>
+              <td>
+                <select data-rw-field="horizontal-size" onchange="recalculateRetainingWall(this)" aria-label="Horizontal Rebar Size">
+                  <option value="3">#3 (3/8&Prime;)</option>
+                  <option value="4">#4 (1/2&Prime;)</option>
+                  <option value="5" selected>#5 (5/8&Prime;)</option>
+                  <option value="6">#6 (3/4&Prime;)</option>
+                  <option value="7">#7 (7/8&Prime;)</option>
+                  <option value="8">#8 (1&Prime;)</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" data-rw-field="horizontal-count" value="9" min="1" step="1" oninput="onRwInput(this)" aria-label="Horizontal Bars per Mat" />
+              </td>
+              <td>
+                <input type="number" data-rw-field="horizontal-stick" value="20" min="1" step="1" oninput="onRwInput(this)" aria-label="Stick Length feet" />
+              </td>
+              <td>
+                <input type="number" data-rw-field="horizontal-lap" value="2" min="0" step="0.5" oninput="onRwInput(this)" aria-label="Lap Splice feet" />
+              </td>
+            </tr>
+          </table>
+          <table>
+            <tr>
+              <th>Total Runs</th>
+              <th>Run Length (ft)</th>
+              <th>Coverage Needed (ft)</th>
+              <th>Lap Material (ft)</th>
+              <th>Total Sticks</th>
+            </tr>
+            <tr>
+              <td><span class="calc-output calc-output-info" data-rw-output="horizontal-runs">&mdash;</span></td>
+              <td><span class="calc-output calc-output-info" data-rw-output="horizontal-length">&mdash;</span></td>
+              <td><span class="calc-output calc-output-warn" data-rw-output="coverage-needed">&mdash;</span></td>
+              <td><span class="calc-output calc-output-warn" data-rw-output="lap-material">&mdash;</span></td>
+              <td><span class="calc-output" data-rw-output="horizontal-sticks">&mdash;</span></td>
+            </tr>
+          </table>
+
+          <!-- Legs (Vertical) -->
+          <div class="subsection-title">Legs (Vertical)</div>
+          <table>
+            <tr>
+              <th>Size</th>
+              <th>Length (ft)</th>
+              <th>Length (in)</th>
+              <th>Spacing Mode</th>
+            </tr>
+            <tr>
+              <td>
+                <select data-rw-field="leg-size" onchange="recalculateRetainingWall(this)" aria-label="Leg Rebar Size">
+                  <option value="3">#3 (3/8&Prime;)</option>
+                  <option value="4" selected>#4 (1/2&Prime;)</option>
+                  <option value="5">#5 (5/8&Prime;)</option>
+                  <option value="6">#6 (3/4&Prime;)</option>
+                  <option value="7">#7 (7/8&Prime;)</option>
+                  <option value="8">#8 (1&Prime;)</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" data-rw-field="leg-length-ft" value="3" min="0" step="1" oninput="onRwInput(this)" aria-label="Leg Length feet" />
+              </td>
+              <td>
+                <select data-rw-field="leg-length-in" onchange="recalculateRetainingWall(this)" aria-label="Leg Length inches">
+                  <option value="0">0&Prime;</option>
+                  <option value="6">6&Prime;</option>
+                </select>
+              </td>
+              <td>
+                <select data-rw-field="leg-spacing-mode" onchange="onLegModeChange(this)" aria-label="Leg Spacing Mode">
+                  <option value="preset-2" selected>2 Legs @ 5 ft intervals</option>
+                  <option value="preset-3">3 Legs @ 5 ft intervals</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+          <div class="rw-leg-custom-inputs" style="display:none;">
+            <table>
+              <tr>
+                <th>Custom Spacing (ft)</th>
+                <th>Custom Spacing (in)</th>
+                <th>Legs per Station</th>
+              </tr>
+              <tr>
+                <td>
+                  <input type="number" data-rw-field="leg-custom-spacing-ft" value="5" min="0" step="1" oninput="onRwInput(this)" aria-label="Custom Spacing feet" />
+                </td>
+                <td>
+                  <input type="number" data-rw-field="leg-custom-spacing-in" value="0" min="0" max="11" step="1" oninput="onRwInput(this)" aria-label="Custom Spacing inches" />
+                </td>
+                <td>
+                  <input type="number" data-rw-field="leg-custom-count" value="2" min="1" step="1" oninput="onRwInput(this)" aria-label="Legs per Station" />
+                </td>
+              </tr>
+            </table>
+          </div>
+          <table>
+            <tr><th>Total Leg Quantity</th></tr>
+            <tr>
+              <td><span class="calc-output" data-rw-output="leg-qty">&mdash;</span></td>
+            </tr>
+          </table>
+
+          <!-- Uprights (RW) -->
+          <div class="subsection-title">Uprights</div>
+          <table>
+            <tr>
+              <th>Size</th>
+              <th>Length (ft)</th>
+              <th>Length (in)</th>
+              <th>Spacing (in)</th>
+              <th>Quantity</th>
+            </tr>
+            <tr>
+              <td>
+                <select data-rw-field="upright-size" onchange="recalculateRetainingWall(this)" aria-label="Upright Rebar Size">
+                  <option value="3">#3 (3/8&Prime;)</option>
+                  <option value="4" selected>#4 (1/2&Prime;)</option>
+                  <option value="5">#5 (5/8&Prime;)</option>
+                  <option value="6">#6 (3/4&Prime;)</option>
+                  <option value="7">#7 (7/8&Prime;)</option>
+                  <option value="8">#8 (1&Prime;)</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" data-rw-field="upright-length-ft" value="4" min="0" step="1" oninput="onRwInput(this)" aria-label="Upright Length feet" />
+              </td>
+              <td>
+                <input type="number" data-rw-field="upright-length-in" value="0" min="0" max="11" step="1" oninput="onRwInput(this)" aria-label="Upright Length inches" />
+              </td>
+              <td>
+                <input type="number" data-rw-field="upright-spacing" value="24" min="1" max="48" step="1" oninput="onRwInput(this)" aria-label="Upright Spacing inches" />
+              </td>
+              <td><span class="calc-output" data-rw-output="upright-qty">&mdash;</span></td>
+            </tr>
+          </table>
+
+          <!-- Order Summary by Size -->
+          <div class="rw-summary-section">
+            <div class="subsection-title" style="margin-top:0;">Order Summary by Rebar Size</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rebar Size</th>
+                  <th>Total Linear Feet</th>
+                  <th>20&prime; Sticks to Order</th>
+                </tr>
+              </thead>
+              <tbody class="rw-summary-body">
+                <tr><td colspan="3" style="text-align:center; color:#888; padding:15px;">Enter footer dimensions to calculate</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+        <!-- ===== END RETAINING WALL CONTENT ===== -->
 
         <!-- Bulkheads -->
         <table>
           <tr>
-            <th>Bulkheads / Mamparos</th>
-            <th>Qty / Cantidad</th>
-            <th>Height / Altura</th>
+            <th>Bulkheads</th>
+            <th>Qty</th>
+            <th>Height</th>
           </tr>
           <tr>
             <td></td>
@@ -348,9 +642,9 @@
         <!-- Piers -->
         <table>
           <tr>
-            <th>Piers Qty / Cant. Pilares</th>
-            <th>Size / Tamaño</th>
-            <th>Custom / Pers.</th>
+            <th>Piers Qty</th>
+            <th>Size</th>
+            <th>Custom</th>
           </tr>
           <tr>
             <td>
@@ -365,83 +659,59 @@
               </select>
             </td>
             <td class="checkbox-item">
-              <input type="checkbox" id="piercustom-1" aria-label="Custom Size / Tamaño Pers." onchange="enableCustomInput(this)" />
-              <label for="piercustom-1">Custom Size / Tamaño Pers.</label>
+              <input type="checkbox" id="piercustom-1" aria-label="Custom Size" onchange="enableCustomInput(this)" />
+              <label for="piercustom-1">Custom Size</label>
               <input type="text" id="piercustominput-1" disabled style="width:120px" placeholder="" aria-label="Custom Pier Size Input" />
             </td>
           </tr>
         </table>
 
         <!-- Fireplace & Porch Pad -->
-        <div class="subsection-title">Fireplace / Chimenea</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder=""
-          aria-label="Fireplace or Chimenea" />
-        <div class="subsection-title">Porch Pad / Base Porche</div>
-        <input type="text" style="width:100%;margin-bottom:10px" placeholder=""
-          aria-label="Porch Pad or Base Porche" />
+        <div class="subsection-title">Fireplace</div>
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Fireplace" />
+        <div class="subsection-title">Porch Pad</div>
+        <input type="text" style="width:100%;margin-bottom:10px" placeholder="" aria-label="Porch Pad" />
 
         <!-- Additional Materials -->
-        <div class="subsection-title">Additional Materials / Materiales Ad.</div>
+        <div class="subsection-title">Additional Materials</div>
         <table>
           <tr>
-            <th>Item / Artículo</th>
-            <th>Qty / Cantidad</th>
-            <th>Notes / Notas</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Notes</th>
           </tr>
           <tr>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Item 1" />
-            </td>
-            <td>
-              <input type="number" step="2" min="0" placeholder="" aria-label="Additional Material Quantity 1" oninput="validateNonNegative(this)" />
-            </td>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Notes 1" />
-            </td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Item 1" /></td>
+            <td><input type="number" step="2" min="0" placeholder="" aria-label="Additional Material Quantity 1" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 1" /></td>
           </tr>
           <tr>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Item 2" />
-            </td>
-            <td>
-              <input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 2" oninput="validateNonNegative(this)" />
-            </td>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Notes 2" />
-            </td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Item 2" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 2" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 2" /></td>
           </tr>
           <tr>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Item 3" />
-            </td>
-            <td>
-              <input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 3" oninput="validateNonNegative(this)" />
-            </td>
-            <td>
-              <input type="text" placeholder="" aria-label="Additional Material Notes 3" />
-            </td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Item 3" /></td>
+            <td><input type="number" step="1" min="0" placeholder="" aria-label="Additional Material Quantity 3" oninput="validateNonNegative(this)" /></td>
+            <td><input type="text" placeholder="" aria-label="Additional Material Notes 3" /></td>
           </tr>
         </table>
 
         <!-- Section Notes -->
-        <div class="subsection-title">Section Notes / Notas Sección</div>
+        <div class="subsection-title">Section Notes</div>
         <textarea placeholder="" aria-label="Section Notes"></textarea>
       </div>
     </div>
 
     <!-- ADD / COUNT SECTIONS -->
     <button class="btn btn-blue no-print" onclick="addSection()" type="button" aria-label="Add Footing Section">
-      Add Section / Agregar Sección
+      Add Section
     </button>
-    <div class="section-title" aria-level="2" role="heading">
-      Number of Sections / Número de Secciones:
-    </div>
-    <div class="checkbox-group" id="section-count-group" role="radiogroup" aria-label="Number of Sections">
-      <!-- Section count radios generated by script -->
-    </div>
+    <div class="section-title" aria-level="2" role="heading">Number of Sections:</div>
+    <div class="checkbox-group" id="section-count-group" role="radiogroup" aria-label="Number of Sections"></div>
 
     <!-- CONCRETE INFO -->
-    <div class="section-title" aria-level="2" role="heading">Concrete Info / Info de Concreto</div>
+    <div class="section-title" aria-level="2" role="heading">Concrete Info</div>
     <div class="checkbox-group" role="radiogroup" aria-label="Concrete Company">
       <div class="checkbox-item">
         <input id="imi" name="concrete-company" type="radio" onclick="updateConcreteCompany('imi')" aria-label="IMI Concrete Company" />
@@ -452,15 +722,12 @@
         <label for="srm">SRM</label>
       </div>
       <div class="input-group" style="flex:1;">
-        <label for="other-company">Other / Otro:</label>
-        <input id="other-company" class="input-field" type="text" oninput="updateConcreteCompany('other')" placeholder=""
-          aria-label="Other Concrete Company" />
+        <label for="other-company">Other:</label>
+        <input id="other-company" class="input-field" type="text" oninput="updateConcreteCompany('other')" placeholder="" aria-label="Other Concrete Company" />
       </div>
     </div>
     <table>
-      <tr>
-        <th>Yards Poured / Yardas Vertidas</th>
-      </tr>
+      <tr><th>Yards Poured</th></tr>
       <tr>
         <td>
           <div class="counter-group">
@@ -471,8 +738,8 @@
     </table>
     <table>
       <tr>
-        <th>Additives / Aditivos</th>
-        <th>Strength (psi) / Resistencia (psi)</th>
+        <th>Additives</th>
+        <th>Strength (psi)</th>
       </tr>
       <tr>
         <td>
@@ -485,7 +752,7 @@
     </table>
 
     <!-- PUMP CO. -->
-    <div class="section-title" aria-level="2" role="heading">Pump Co. / Empresa Bomba</div>
+    <div class="section-title" aria-level="2" role="heading">Pump Co.</div>
     <div class="checkbox-group" role="radiogroup" aria-label="Pump Company">
       <div class="checkbox-item">
         <input id="pump-cpp" name="pump-company" type="radio" onclick="updatePumpCompany('cpp')" aria-label="CPP Pump Company" />
@@ -496,22 +763,22 @@
         <label for="pump-brundage">Brundage</label>
       </div>
       <div class="input-group" style="flex:1;">
-        <label for="pump-other">Other / Otro:</label>
+        <label for="pump-other">Other:</label>
         <input id="pump-other" class="input-field" type="text" oninput="updatePumpCompany('other')" placeholder="" aria-label="Other Pump Company" />
       </div>
     </div>
 
     <!-- CREW INFO (Toggleable) -->
     <div class="section-title" aria-level="2" role="heading">
-      Crew Info / Info del Equipo
+      Crew Info
       <button class="btn btn-toggle no-print" data-target="crew-section" type="button">Hide</button>
     </div>
     <div id="crew-section" class="toggle-target">
       <table id="crew-table" aria-label="Crew Information">
         <tr>
-          <th>Name / Nombre</th>
-          <th>Role / Rol</th>
-          <th>Hours / Horas</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Hours</th>
         </tr>
         <tr>
           <td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>
@@ -530,13 +797,12 @@
         </tr>
       </table>
       <button class="btn btn-blue no-print" onclick="addCrewMember()" type="button" aria-label="Add Crew Member">
-        Add Crew Member / Agregar Miembro
+        Add Crew Member
       </button>
     </div>
 
-
-    <!-- EQUIP HRS / DESC -->
-    <div class="section-title" aria-level="2" role="heading">Equipment Hours & Description / Horas y Descripción</div>
+    <!-- EQUIPMENT HOURS -->
+    <div class="section-title" aria-level="2" role="heading">Equipment Hours &amp; Description</div>
     <table aria-label="Equipment Hours and Description">
       <tr>
         <th>Equipment</th>
@@ -566,78 +832,78 @@
     </table>
 
     <!-- SUPPLIES USED -->
-    <div class="section-title" aria-level="2" role="heading">Supplies Used / Suministros Usados</div>
+    <div class="section-title" aria-level="2" role="heading">Supplies Used</div>
     <table aria-label="Supplies Used">
       <tr>
-        <th>Supply / Suministro</th>
-        <th>Quantity / Notas</th>
+        <th>Supply</th>
+        <th>Quantity / Notes</th>
       </tr>
       <tr>
-        <td>Paint / Pintura</td>
+        <td>Paint</td>
         <td>
-          Boxes/Cajas <input type="number" style="width:60px" placeholder="" aria-label="Paint Boxes Quantity" oninput="validateNonNegative(this)" />
-          Cans/Latas <input type="number" style="width:60px" placeholder="" aria-label="Paint Cans Quantity" oninput="validateNonNegative(this)" />
+          Boxes <input type="number" style="width:60px" placeholder="" aria-label="Paint Boxes Quantity" oninput="validateNonNegative(this)" />
+          Cans <input type="number" style="width:60px" placeholder="" aria-label="Paint Cans Quantity" oninput="validateNonNegative(this)" />
         </td>
       </tr>
       <tr>
-        <td>Chairs (boxes) / Sillas (cajas)</td>
+        <td>Chairs (boxes)</td>
         <td><input type="number" placeholder="" aria-label="Chairs Boxes Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td>Grade Pins (boxes) / Pines (cajas)</td>
+        <td>Grade Pins (boxes)</td>
         <td><input type="number" placeholder="" aria-label="Grade Pins Boxes Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td>2 × 4 × 16'</td>
+        <td>2 &times; 4 &times; 16'</td>
         <td><input type="number" placeholder="" aria-label="2x4x16 Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td>Plywood (sheets) / Contrachapado</td>
+        <td>Plywood (sheets)</td>
         <td><input type="number" placeholder="" aria-label="Plywood Sheets Quantity" oninput="validateNonNegative(this)" /></td>
       </tr>
       <tr>
-        <td>Lumber Notes / Notas de Madera</td>
+        <td>Lumber Notes</td>
         <td><textarea id="lumber-notes" style="height:100px" placeholder="" aria-label="Lumber Notes"></textarea></td>
       </tr>
     </table>
 
     <!-- MANAGEMENT JOB CODING (Toggleable) -->
     <div class="section-title" aria-level="2" role="heading">
-      Management Job Coding / Cod. Gestión
+      Management Job Coding
       <button class="btn btn-toggle no-print" data-target="coding-section" type="button">Hide</button>
     </div>
     <div id="coding-section" class="toggle-target">
       <div class="input-group">
-        <label for="builder">Builder / Constructor:</label>
-        <input id="builder" class="input-field" type="text" placeholder="" aria-label="Builder or Constructor" />
+        <label for="builder">Builder:</label>
+        <input id="builder" class="input-field" type="text" placeholder="" aria-label="Builder" />
       </div>
       <div class="input-group">
-        <label for="city-county">City/County / Ciudad:</label>
+        <label for="city-county">City/County:</label>
         <input id="city-county" class="input-field" type="text" placeholder="" aria-label="City or County" />
       </div>
       <div class="checkbox-group" role="group" aria-label="Job Type">
         <div class="checkbox-item">
           <input id="job-turnkey" type="checkbox" aria-label="Turnkey Job" />
-          <label for="job-turnkey">Turnkey / Llave Mano</label>
+          <label for="job-turnkey">Turnkey</label>
         </div>
         <div class="checkbox-item">
           <input id="job-house" type="checkbox" aria-label="House Job" />
-          <label for="job-house">House / Casa</label>
+          <label for="job-house">House</label>
         </div>
         <div class="checkbox-item">
           <input id="job-labor" type="checkbox" aria-label="Labor Only Job" />
-          <label for="job-labor">Labor Only / Solo O.</label>
+          <label for="job-labor">Labor Only</label>
         </div>
         <div class="checkbox-item">
           <input id="job-retaining" type="checkbox" aria-label="Retaining Wall Job" />
-          <label for="job-retaining">Retaining Wall / Muro</label>
+          <label for="job-retaining">Retaining Wall</label>
         </div>
       </div>
     </div>
 
     <!-- ADDITIONAL NOTES (Toggleable) -->
     <div class="section-title" aria-level="2" role="heading">
-      Additional Notes / Notas Adicionales
+      Additional Notes
       <button class="btn btn-toggle no-print" data-target="notes-section" type="button">Hide</button>
     </div>
     <div id="notes-section" class="toggle-target">
@@ -646,17 +912,17 @@
 
     <!-- SAVE AS PDF -->
     <button class="btn btn-green no-print" onclick="savePDF()" type="button" aria-label="Save form as PDF">
-      Save as PDF / Guardar PDF
+      Save as PDF
     </button>
   </div>
 
   <!-- html2pdf bundle -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    // Set today's date
+    // Today's date
     document.getElementById('date').value = new Date().toLocaleDateString();
 
-    // Enter key navigation (skipping textarea)
+    // Enter-key navigation (skip textareas)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();
@@ -666,20 +932,207 @@
       }
     });
 
-    // Validate number inputs to prevent negative or invalid values
     function validateNonNegative(input) {
-      if (input.value !== '' && Number(input.value) < 0) {
-        input.value = '';
-      }
+      if (input.value !== '' && Number(input.value) < 0) input.value = '';
     }
-    // Validate minimum value for inputs such as strength psi
     function validateMinValue(input, min) {
-      if (input.value !== '' && Number(input.value) < min) {
-        input.value = '';
+      if (input.value !== '' && Number(input.value) < min) input.value = '';
+    }
+
+    // ====================================================================
+    // RETAINING WALL CALCULATOR
+    // ====================================================================
+
+    function formatFeetInches(decimalFeet) {
+      if (!isFinite(decimalFeet) || decimalFeet < 0) decimalFeet = 0;
+      const feet = Math.floor(decimalFeet);
+      const inches = Math.round((decimalFeet - feet) * 12);
+      if (inches === 12) return (feet + 1) + "' 0\"";
+      return feet + "' " + inches + '"';
+    }
+
+    function toggleRetainingWall(checkbox) {
+      const section = checkbox.closest('.section');
+      if (!section) return;
+      const standardDiv = section.querySelector('.standard-footing-content');
+      const rwDiv = section.querySelector('.retaining-wall-content');
+      const titleEl = section.querySelector('.section-title');
+      const sectionNum = section.id.replace('section-', '');
+
+      if (checkbox.checked) {
+        if (standardDiv) standardDiv.style.display = 'none';
+        if (rwDiv) rwDiv.style.display = '';
+        section.classList.add('rw-active');
+        if (titleEl) titleEl.textContent = 'Footing Section ' + sectionNum + ' (Retaining Wall)';
+        recalculateRetainingWall(checkbox);
+      } else {
+        if (standardDiv) standardDiv.style.display = '';
+        if (rwDiv) rwDiv.style.display = 'none';
+        section.classList.remove('rw-active');
+        if (titleEl) titleEl.textContent = 'Footing Section ' + sectionNum;
       }
     }
 
-    // --- TOGGLE SECTIONS ---
+    function onRwInput(input) {
+      validateNonNegative(input);
+      recalculateRetainingWall(input);
+    }
+
+    function onLegModeChange(sel) {
+      const section = sel.closest('.section');
+      if (!section) return;
+      const customDiv = section.querySelector('.rw-leg-custom-inputs');
+      if (customDiv) customDiv.style.display = sel.value === 'custom' ? '' : 'none';
+      recalculateRetainingWall(sel);
+    }
+
+    // Triggered by Length/Width inputs at top of each section
+    function onDimensionInput(input) {
+      validateNonNegative(input);
+      recalculateRetainingWall(input);
+    }
+
+    function recalculateRetainingWall(triggerEl) {
+      const section = triggerEl.closest('.section');
+      if (!section) return;
+
+      // Skip work if RW content is hidden
+      const rwDiv = section.querySelector('.retaining-wall-content');
+      if (!rwDiv || rwDiv.style.display === 'none') return;
+
+      const getField = (name) => section.querySelector('[data-rw-field="' + name + '"]');
+      const getNum = (name, dflt) => {
+        const el = getField(name);
+        if (!el) return dflt;
+        const v = parseFloat(el.value);
+        return isFinite(v) ? v : dflt;
+      };
+      const setOutput = (name, value) => {
+        const el = section.querySelector('[data-rw-output="' + name + '"]');
+        if (el) el.textContent = value;
+      };
+
+      // Footer dimensions sourced from the section's L/W inputs
+      const lengthInput = section.querySelector('[data-footer-dim="length-ft"]');
+      const widthInput  = section.querySelector('[data-footer-dim="width-in"]');
+      const footerLengthFt = lengthInput && lengthInput.value !== '' ? (parseFloat(lengthInput.value) || 0) : 0;
+      const footerWidthIn  = widthInput  && widthInput.value  !== '' ? (parseFloat(widthInput.value)  || 0) : 0;
+      const footerWidthFt  = footerWidthIn / 12;
+
+      // Mat multiplier
+      const matRadio = section.querySelector('input[type="radio"][name^="rw-mat-"]:checked');
+      const matMultiplier = matRadio ? parseInt(matRadio.value) : 1;
+
+      // ----- Cross Bars -----
+      const crossbarLengthFt = Math.max(0, footerWidthFt - 0.5); // 6" cover
+      const crossbarSpacingIn = getNum('crossbar-spacing', 12);
+      const crossbarSpacingFt = crossbarSpacingIn / 12;
+      const crossbarQtyPerMat = (footerLengthFt > 0 && crossbarSpacingFt > 0)
+        ? Math.ceil(footerLengthFt / crossbarSpacingFt) + 1
+        : 0;
+      const crossbarTotalQty = crossbarQtyPerMat * matMultiplier;
+      const crossbarTotalFt  = crossbarTotalQty * crossbarLengthFt;
+
+      setOutput('crossbar-length', formatFeetInches(crossbarLengthFt));
+      setOutput('crossbar-qty', crossbarQtyPerMat);
+
+      // ----- Horizontal Rebar -----
+      const horizontalLengthFt = footerLengthFt > 0 ? footerLengthFt + 4 : 0; // 2 ft each end
+      const horizontalCount       = Math.max(0, Math.floor(getNum('horizontal-count', 0)));
+      const horizontalStickLength = getNum('horizontal-stick', 20);
+      const horizontalLap         = getNum('horizontal-lap', 2);
+      const effectivePerStick     = horizontalStickLength - horizontalLap;
+
+      let sticksPerBar = 0;
+      if (horizontalLengthFt > 0) {
+        sticksPerBar = 1;
+        if (horizontalLengthFt > horizontalStickLength && effectivePerStick > 0) {
+          sticksPerBar = 1 + Math.ceil((horizontalLengthFt - horizontalStickLength) / effectivePerStick);
+        }
+      }
+      const horizontalBarsTotal   = horizontalCount * matMultiplier;
+      const horizontalSticksTotal = horizontalBarsTotal * sticksPerBar;
+      const coverageNeeded        = horizontalBarsTotal * horizontalLengthFt;
+      const totalMaterialFt       = horizontalSticksTotal * horizontalStickLength;
+      const lapMaterial           = Math.max(0, totalMaterialFt - coverageNeeded);
+
+      setOutput('horizontal-runs',    horizontalBarsTotal);
+      setOutput('horizontal-length',  Math.round(horizontalLengthFt));
+      setOutput('coverage-needed',    Math.round(coverageNeeded));
+      setOutput('lap-material',       Math.round(lapMaterial));
+      setOutput('horizontal-sticks',  horizontalSticksTotal);
+
+      // ----- Legs -----
+      const legLengthFt = getNum('leg-length-ft', 0);
+      const legLengthIn = getNum('leg-length-in', 0);
+      const legTotalLengthFt = legLengthFt + legLengthIn / 12;
+
+      const legSpacingModeEl = getField('leg-spacing-mode');
+      const legSpacingMode   = legSpacingModeEl ? legSpacingModeEl.value : 'preset-2';
+      let legQty = 0;
+      if (footerLengthFt > 0) {
+        if (legSpacingMode === 'preset-2') {
+          legQty = (Math.ceil(footerLengthFt / 5) + 1) * 2;
+        } else if (legSpacingMode === 'preset-3') {
+          legQty = (Math.ceil(footerLengthFt / 5) + 1) * 3;
+        } else {
+          const customSpacingFt = getNum('leg-custom-spacing-ft', 0) + getNum('leg-custom-spacing-in', 0) / 12;
+          const legsPerStation  = Math.max(1, Math.floor(getNum('leg-custom-count', 1)));
+          const stations = customSpacingFt > 0 ? Math.ceil(footerLengthFt / customSpacingFt) + 1 : 1;
+          legQty = stations * legsPerStation;
+        }
+      }
+      setOutput('leg-qty', legQty);
+      const legTotalFt = legQty * legTotalLengthFt;
+
+      // ----- Uprights -----
+      const uprightLengthFt  = getNum('upright-length-ft', 0) + getNum('upright-length-in', 0) / 12;
+      const uprightSpacingIn = getNum('upright-spacing', 24);
+      const uprightSpacingFt = uprightSpacingIn / 12;
+      const uprightQty = (footerLengthFt > 0 && uprightSpacingFt > 0)
+        ? Math.ceil(footerLengthFt / uprightSpacingFt) + 1
+        : 0;
+      setOutput('upright-qty', uprightQty);
+      const uprightTotalFt = uprightQty * uprightLengthFt;
+
+      // ----- Order Summary by Size -----
+      const crossbarSize   = getField('crossbar-size')   ? getField('crossbar-size').value   : '4';
+      const horizontalSize = getField('horizontal-size') ? getField('horizontal-size').value : '5';
+      const legSize        = getField('leg-size')        ? getField('leg-size').value        : '4';
+      const uprightSize    = getField('upright-size')    ? getField('upright-size').value    : '4';
+
+      const sizeMap = {};
+      function addToSize(size, ft, sticks) {
+        if (!sizeMap[size]) sizeMap[size] = { ft: 0, sticks: 0 };
+        sizeMap[size].ft += ft;
+        sizeMap[size].sticks += sticks;
+      }
+      addToSize(crossbarSize,   crossbarTotalFt,   Math.ceil(crossbarTotalFt / 20));
+      addToSize(horizontalSize, totalMaterialFt,   horizontalSticksTotal);
+      addToSize(legSize,        legTotalFt,        Math.ceil(legTotalFt / 20));
+      addToSize(uprightSize,    uprightTotalFt,    Math.ceil(uprightTotalFt / 20));
+
+      const sortedSizes = Object.keys(sizeMap).sort((a, b) => parseInt(a) - parseInt(b));
+      let html = '';
+      sortedSizes.forEach(size => {
+        if (sizeMap[size].ft > 0) {
+          html += '<tr>'
+                + '<td><span class="rebar-badge">#' + size + '</span></td>'
+                + '<td>' + sizeMap[size].ft.toFixed(1) + ' ft</td>'
+                + '<td><strong>' + sizeMap[size].sticks + '</strong></td>'
+                + '</tr>';
+        }
+      });
+      if (!html) {
+        html = '<tr><td colspan="3" style="text-align:center; color:#888; padding:15px;">Enter footer dimensions to calculate</td></tr>';
+      }
+      const summaryBody = section.querySelector('.rw-summary-body');
+      if (summaryBody) summaryBody.innerHTML = html;
+    }
+
+    // ====================================================================
+    // TOGGLE SECTIONS (Crew, Coding, Notes)
+    // ====================================================================
     document.addEventListener('click', (e) => {
       if (e.target.matches('.btn-toggle')) {
         const btn = e.target;
@@ -696,21 +1149,19 @@
       }
     });
 
-    // --- SAVE PDF ---
+    // ====================================================================
+    // SAVE PDF
+    // ====================================================================
     function savePDF() {
-      // Hide non-printable elements
       const ui = document.querySelectorAll('.no-print');
       ui.forEach((el) => (el.style.display = 'none'));
 
       const element = document.getElementById('form-root');
-
-      // Clone element to preserve original styles
       const clone = element.cloneNode(true);
       clone.style.width = '100%';
       clone.style.overflow = 'visible';
       document.body.appendChild(clone);
 
-      // Inject print-safe styles into clone
       const style = document.createElement('style');
       style.textContent = `
         input, select, textarea {
@@ -736,42 +1187,55 @@
         margin: 0.2,
         filename: 'concrete_job_form.pdf',
         pagebreak: { mode: ['avoid-all', 'css'], before: '.section' },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          scrollY: 0,
-          windowHeight: clone.scrollHeight
-        },
-        jsPDF: {
-          unit: 'in',
-          format: 'letter',
-          orientation: 'portrait',
-          hotfixes: ['px_scaling']
-        }
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowHeight: clone.scrollHeight },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait', hotfixes: ['px_scaling'] }
       };
 
-      html2pdf()
-        .set(opt)
-        .from(clone)
-        .save()
+      html2pdf().set(opt).from(clone).save()
         .then(() => {
           document.body.removeChild(clone);
           ui.forEach((el) => (el.style.display = ''));
         })
         .catch((err) => {
           console.error('PDF generation failed:', err);
-          if (document.body.contains(clone)) {
-            document.body.removeChild(clone);
-          }
+          if (document.body.contains(clone)) document.body.removeChild(clone);
           ui.forEach((el) => (el.style.display = ''));
           alert('Failed to generate PDF. Please try again.');
         });
     }
 
-    // --- DYNAMIC SECTIONS (as in the original) ---
+    // ====================================================================
+    // DYNAMIC SECTION MANAGEMENT
+    // ====================================================================
     let sectionCount = 1;
 
-    // Generate radio buttons showing the current section count
+    // Map ID prefix to its radio name prefix (or null if not a radio).
+    const ID_PREFIXES = [
+      { prefix: 'single-mat-',            radioName: 'mat-type-' },
+      { prefix: 'double-mat-',            radioName: 'mat-type-' },
+      { prefix: 'piercustom-',            radioName: null },
+      { prefix: 'piercustominput-',       radioName: null },
+      { prefix: 'piersize-',              radioName: null },
+      { prefix: 'retaining-wall-toggle-', radioName: null },
+      { prefix: 'rw-mat-single-',         radioName: 'rw-mat-' },
+      { prefix: 'rw-mat-double-',         radioName: 'rw-mat-' },
+      { prefix: 'rw-mat-triple-',         radioName: 'rw-mat-' }
+    ];
+
+    function applyIdPrefixes(scope, num) {
+      ID_PREFIXES.forEach(({ prefix, radioName }) => {
+        const el = scope.querySelector('[id^="' + prefix + '"]');
+        if (el) {
+          el.id = prefix + num;
+          if (el.type === 'radio' && radioName) {
+            el.name = radioName + num;
+          }
+          const lbl = scope.querySelector('label[for^="' + prefix + '"]');
+          if (lbl) lbl.htmlFor = el.id;
+        }
+      });
+    }
+
     function updateSectionCountRadios() {
       const container = document.getElementById('section-count-group');
       container.innerHTML = '';
@@ -782,7 +1246,7 @@
         radio.name = 'section-count';
         radio.id = id;
         radio.value = i;
-        radio.setAttribute('aria-label', `Select ${i} sections`);
+        radio.setAttribute('aria-label', 'Select ' + i + ' sections');
         radio.onclick = () => updateSectionCount(i);
         if (i === sectionCount) radio.checked = true;
 
@@ -799,45 +1263,62 @@
       }
     }
 
-    // Add a new footing section
     function addSection() {
       sectionCount++;
       const t = document.getElementById('section-1').cloneNode(true);
       t.id = 'section-' + sectionCount;
-      t.querySelectorAll('input,textarea,select').forEach((el) => {
-        if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
-        else el.value = '';
-        if (el.tagName === 'SELECT') el.selectedIndex = 0;
-      });
-      // Update IDs for mat and pier inputs to avoid duplicates in the clone
-      ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
-        (pref) => {
-          const el = t.querySelector('[id^="' + pref + '"]');
-          if (el) {
-            el.id = pref + sectionCount;
-            if (el.type === 'radio') {
-              el.name = 'mat-type-' + sectionCount;
-            }
-            const lbl = t.querySelector('label[for^="' + pref + '"]');
-            if (lbl) lbl.htmlFor = el.id;
-          }
-        }
-      );
-      t.querySelector('.section-title').textContent = 'Footing Section / Sección de Cimentación ' + sectionCount;
+      t.classList.remove('rw-active');
 
-      // Update aria-label on remove button
+      // Reset values, but preserve RW field defaults so the calc works
+      // immediately when the user toggles RW mode on.
+      t.querySelectorAll('input,textarea,select').forEach((el) => {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          el.checked = false;
+        } else if (!el.hasAttribute('data-rw-field')) {
+          el.value = '';
+          if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        }
+      });
+
+      // Update prefixed IDs and radio names
+      applyIdPrefixes(t, sectionCount);
+
+      // Default the RW mat back to "single"
+      const matSingleRadio = t.querySelector('[id^="rw-mat-single-"]');
+      if (matSingleRadio) matSingleRadio.checked = true;
+
+      // Reset RW visibility
+      const standardDiv = t.querySelector('.standard-footing-content');
+      if (standardDiv) standardDiv.style.display = '';
+      const rwDiv = t.querySelector('.retaining-wall-content');
+      if (rwDiv) rwDiv.style.display = 'none';
+      const legCustom = t.querySelector('.rw-leg-custom-inputs');
+      if (legCustom) legCustom.style.display = 'none';
+
+      // Reset calc outputs
+      t.querySelectorAll('[data-rw-output]').forEach(el => el.textContent = '\u2014');
+
+      // Reset summary body
+      const summary = t.querySelector('.rw-summary-body');
+      if (summary) {
+        summary.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888; padding:15px;">Enter footer dimensions to calculate</td></tr>';
+      }
+
+      // Update section title
+      const titleEl = t.querySelector('.section-title');
+      if (titleEl) {
+        titleEl.textContent = 'Footing Section ' + sectionCount;
+        titleEl.id = 'section-title-' + sectionCount;
+      }
+
+      // Update remove button aria-label
       const removeBtn = t.querySelector('.remove-section');
-      removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
-      
-      // Update section title aria attributes
-      const sectionTitle = t.querySelector('.section-title');
-      sectionTitle.id = 'section-title-' + sectionCount;
+      if (removeBtn) removeBtn.setAttribute('aria-label', 'Remove Footing Section ' + sectionCount);
 
       document.getElementById('sections-container').appendChild(t);
       updateSectionCountRadios();
     }
 
-    // Remove a footing section (ensure at least one remains)
     function removeSection(sec) {
       const all = [...document.querySelectorAll('#sections-container .section')];
       if (all.length === 1) {
@@ -849,32 +1330,23 @@
       renumber();
     }
 
-    // Renumber sections after removal
     function renumber() {
       sectionCount = 0;
       document.querySelectorAll('#sections-container .section').forEach((s, i) => {
         sectionCount = i + 1;
         s.id = 'section-' + sectionCount;
-        s.querySelector('.section-title').textContent = 'Footing Section / Sección de Cimentación ' + sectionCount;
-        const removeBtn = s.querySelector('.remove-section');
-        if (removeBtn) {
-          removeBtn.setAttribute('aria-label', `Remove Footing Section ${sectionCount}`);
+
+        // Preserve the (Retaining Wall) suffix if currently active
+        const titleEl = s.querySelector('.section-title');
+        const wasRW = titleEl && titleEl.textContent.includes('Retaining Wall');
+        if (titleEl) {
+          titleEl.textContent = 'Footing Section ' + sectionCount + (wasRW ? ' (Retaining Wall)' : '');
+          titleEl.id = 'section-title-' + sectionCount;
         }
-        ['single-mat-', 'double-mat-', 'piercustom-', 'piercustominput-', 'piersize-'].forEach(
-          (pref) => {
-            const el = s.querySelector('[id^="' + pref + '"]');
-            if (el) {
-              el.id = pref + sectionCount;
-              if (el.type === 'radio') {
-                el.name = 'mat-type-' + sectionCount;
-              }
-              const lbl = s.querySelector('label[for^="' + pref + '"]');
-              if (lbl) lbl.htmlFor = el.id;
-            }
-          }
-        );
-        const sectionTitle = s.querySelector('.section-title');
-        sectionTitle.id = 'section-title-' + sectionCount;
+        const removeBtn = s.querySelector('.remove-section');
+        if (removeBtn) removeBtn.setAttribute('aria-label', 'Remove Footing Section ' + sectionCount);
+
+        applyIdPrefixes(s, sectionCount);
       });
       updateSectionCountRadios();
     }
@@ -892,44 +1364,34 @@
       updateSectionCountRadios();
     }
 
-    // Custom pier size helpers
     function enableCustomInput(cb) {
-      const i = cb.id.split('-')[1];
+      const i = cb.id.split('-').pop();
       const inp = document.getElementById('piercustominput-' + i);
+      if (!inp) return;
       inp.disabled = !cb.checked;
       if (!cb.checked) inp.value = '';
     }
     function toggleCustomSize(sel) {
-      const i = sel.id.split('-')[1];
-      const cb = document.getElementById('piercustom-' + i);
+      const i = sel.id.split('-').pop();
+      const cb  = document.getElementById('piercustom-' + i);
       const inp = document.getElementById('piercustominput-' + i);
-      cb.checked = false;
-      inp.disabled = true;
-      inp.value = '';
+      if (cb)  cb.checked = false;
+      if (inp) { inp.disabled = true; inp.value = ''; }
     }
 
-    // Crew & Equipment rows helpers
     function addCrewMember() {
       const r = document.getElementById('crew-table').insertRow(-1);
       r.innerHTML = '<td><input type="text" placeholder="" aria-label="Crew Member Name" /></td>' +
                     '<td><input type="text" placeholder="" aria-label="Crew Member Role" /></td>' +
                     '<td><input type="number" step="0.5" placeholder="" aria-label="Crew Member Hours" oninput="validateNonNegative(this)" /></td>';
     }
-    function addEquipmentRow() {
-      const r = document.getElementById('equipment-table').insertRow(-1);
-      r.innerHTML = '<td><input type="text" placeholder="" aria-label="Equipment Name" /></td>' +
-                    '<td><input type="number" step="0.5" placeholder="" aria-label="Equipment Hours" oninput="validateNonNegative(this)" /></td>' +
-                    '<td><input type="text" placeholder="" aria-label="Equipment Notes" /></td>';
-    }
 
-    // Single-select helpers for concrete company
     function updateConcreteCompany(c) {
       if (c === 'imi' || c === 'srm') {
         document.getElementById(c).checked = true;
         document.getElementById('other-company').value = '';
       }
     }
-    // Single-select helpers for pump company
     function updatePumpCompany(c) {
       if (c === 'cpp' || c === 'brundage') {
         document.getElementById('pump-' + c).checked = true;
@@ -937,7 +1399,6 @@
       }
     }
 
-    // Initialize section count radios on page load
     updateSectionCountRadios();
   </script>
 </body>
