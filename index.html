@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Concrete Job Form</title>
+  <script src="https://js.puter.com/v2/"></script>
   <style>
     /* ===== SCREEN STYLES ===== */
     body {
@@ -221,6 +222,119 @@
       color: #b8860b;
     }
 
+    /* ===== PARSE JOB NOTES PANEL ===== */
+    .parse-panel {
+      background: #f5f9ff;
+      border: 2px solid #2196f3;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 0 0 24px;
+    }
+    .parse-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .parse-icon { font-size: 18px; }
+    .parse-hint {
+      font-weight: normal;
+      color: #555;
+      font-size: 13px;
+      margin-left: auto;
+    }
+    #parse-input {
+      width: 100%;
+      min-height: 110px;
+      border: 1px solid #90caf9;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+      resize: vertical;
+    }
+    .parse-buttons {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+    }
+    .parse-buttons .btn { margin: 0; }
+    .parse-result {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .parse-result .filled {
+      background: #e8f5e9;
+      border-left: 3px solid #4caf50;
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 3px;
+    }
+    .parse-result .skipped {
+      background: #fff3e0;
+      border-left: 3px solid #ff9800;
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 3px;
+    }
+    .parse-result ul { margin: 4px 0 0 18px; padding: 0; }
+    .parse-result li { margin: 2px 0; }
+    .parse-result code {
+      background: #fff;
+      padding: 1px 5px;
+      border-radius: 2px;
+      border: 1px solid #ddd;
+      font-size: 12px;
+    }
+    .ai-toggle-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .ai-toggle-label input { cursor: pointer; }
+    .ai-settings {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid #90caf9;
+      border-radius: 4px;
+    }
+    .ai-settings-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ai-settings-row label {
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .ai-settings-row input[type="password"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 5px 8px;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+    .ai-settings-row .btn { margin: 0; }
+    .ai-settings-hint {
+      font-size: 12px;
+      color: #555;
+      margin-top: 8px;
+    }
+    .parse-result .ai-added {
+      background: #f3e5f5;
+      border-left: 3px solid #9c27b0;
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 3px;
+    }
+
     /* ===== PRINT STYLES (one-page) ===== */
     @media print {
       .header {
@@ -270,6 +384,40 @@
       </div>
     </div>
 
+    <!-- PARSE JOB NOTES PANEL -->
+    <div class="parse-panel no-print" id="parse-panel">
+      <div class="parse-header">
+        <span class="parse-icon">📋</span>
+        <strong>Paste Job Notes</strong>
+        <span class="parse-hint">Voice-to-text or paste raw notes &mdash; click Parse to auto-fill</span>
+      </div>
+      <textarea id="parse-input" placeholder="Example:&#10;850 total linear ft for the house&#10;160 rebar #4 x3 continual&#10;34 bulkheads 1' tall&#10;129 yards imi, 53M Brundage pump&#10;5 box chairs, 4 box pins, 5 box paint&#10;8 hours machine time to clean safe room"></textarea>
+      <div class="parse-buttons">
+        <button class="btn btn-blue no-print" type="button" onclick="parseJobNotes()" aria-label="Parse Notes">Parse Notes</button>
+        <label class="ai-toggle-label">
+          <input type="checkbox" id="ai-enabled" checked onchange="onAiToggle()" />
+          <span>Use AI cleanup (GitHub Models)</span>
+        </label>
+        <button class="btn btn-toggle no-print" type="button" onclick="toggleAiSettings()" id="ai-settings-btn" aria-label="AI Settings">AI Settings</button>
+        <button class="btn btn-toggle no-print" type="button" onclick="document.getElementById('parse-input').value=''; document.getElementById('parse-result').innerHTML='';" aria-label="Clear">Clear</button>
+      </div>
+
+      <div id="ai-settings-panel" class="ai-settings" style="display:none;">
+        <div class="ai-settings-row">
+          <label for="gemini-key">GitHub PAT:</label>
+          <input type="password" id="gemini-key" value="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" placeholder="paste fine-grained PAT from github.com/settings/personal-access-tokens" />
+          <button class="btn btn-blue no-print" type="button" onclick="saveGeminiKey()" aria-label="Save Token">Save</button>
+          <button class="btn btn-toggle no-print" type="button" onclick="clearGeminiKey()" aria-label="Clear Token">Forget</button>
+        </div>
+        <div class="ai-settings-hint">
+          Get a fine-grained PAT at <code>github.com/settings/personal-access-tokens</code> with <strong>Models: read</strong> permission.
+          Free tier, no card. Token stored in your browser only, sent only to GitHub.
+        </div>
+      </div>
+
+      <div id="parse-result" class="parse-result"></div>
+    </div>
+
     <!-- FOOTING SECTIONS -->
     <div id="sections-container">
       <div class="section" id="section-1">
@@ -306,11 +454,11 @@
               </div>
             </td>
             <td>
-              <input type="number" data-footer-dim="width-in" step="6" min="0" placeholder=""
+              <input type="number" data-footer-dim="width-in" value="28" step="6" min="0" placeholder=""
                 aria-label="Width in inches" oninput="onDimensionInput(this)" />
             </td>
             <td>
-              <input type="number" step="6" min="0" placeholder=""
+              <input type="number" value="12" step="6" min="0" placeholder=""
                 aria-label="Depth in inches" oninput="validateNonNegative(this)" />
             </td>
           </tr>
@@ -465,8 +613,8 @@
               <td>
                 <select data-rw-field="horizontal-size" onchange="recalculateRetainingWall(this)" aria-label="Horizontal Rebar Size">
                   <option value="3">#3 (3/8&Prime;)</option>
-                  <option value="4">#4 (1/2&Prime;)</option>
-                  <option value="5" selected>#5 (5/8&Prime;)</option>
+                  <option value="4" selected>#4 (1/2&Prime;)</option>
+                  <option value="5">#5 (5/8&Prime;)</option>
                   <option value="6">#6 (3/4&Prime;)</option>
                   <option value="7">#7 (7/8&Prime;)</option>
                   <option value="8">#8 (1&Prime;)</option>
@@ -489,6 +637,7 @@
               <th>Run Length (ft)</th>
               <th>Coverage Needed (ft)</th>
               <th>Lap Material (ft)</th>
+              <th>Cutoff Waste (ft)</th>
               <th>Total Sticks</th>
             </tr>
             <tr>
@@ -496,6 +645,7 @@
               <td><span class="calc-output calc-output-info" data-rw-output="horizontal-length">&mdash;</span></td>
               <td><span class="calc-output calc-output-warn" data-rw-output="coverage-needed">&mdash;</span></td>
               <td><span class="calc-output calc-output-warn" data-rw-output="lap-material">&mdash;</span></td>
+              <td><span class="calc-output calc-output-warn" data-rw-output="cutoff-waste">&mdash;</span></td>
               <td><span class="calc-output" data-rw-output="horizontal-sticks">&mdash;</span></td>
             </tr>
           </table>
@@ -521,12 +671,12 @@
                 </select>
               </td>
               <td>
-                <input type="number" data-rw-field="leg-length-ft" value="3" min="0" step="1" oninput="onRwInput(this)" aria-label="Leg Length feet" />
+                <input type="number" data-rw-field="leg-length-ft" value="1" min="0" step="1" oninput="onRwInput(this)" aria-label="Leg Length feet" />
               </td>
               <td>
                 <select data-rw-field="leg-length-in" onchange="recalculateRetainingWall(this)" aria-label="Leg Length inches">
                   <option value="0">0&Prime;</option>
-                  <option value="6">6&Prime;</option>
+                  <option value="6" selected>6&Prime;</option>
                 </select>
               </td>
               <td>
@@ -1037,29 +1187,45 @@
       setOutput('crossbar-qty', crossbarQtyPerMat);
 
       // ----- Horizontal Rebar -----
-      const horizontalLengthFt = footerLengthFt > 0 ? footerLengthFt + 4 : 0; // 2 ft each end
+      // Run length = footer length. Lap splice handles overlap when joining sticks.
+      const horizontalLengthFt    = footerLengthFt > 0 ? footerLengthFt : 0;
       const horizontalCount       = Math.max(0, Math.floor(getNum('horizontal-count', 0)));
       const horizontalStickLength = getNum('horizontal-stick', 20);
       const horizontalLap         = getNum('horizontal-lap', 2);
       const effectivePerStick     = horizontalStickLength - horizontalLap;
 
-      let sticksPerBar = 0;
+      let splicesPerRun = 0;
+      let sticksPerRun = 0;
       if (horizontalLengthFt > 0) {
-        sticksPerBar = 1;
         if (horizontalLengthFt > horizontalStickLength && effectivePerStick > 0) {
-          sticksPerBar = 1 + Math.ceil((horizontalLengthFt - horizontalStickLength) / effectivePerStick);
+          splicesPerRun = Math.ceil((horizontalLengthFt - horizontalStickLength) / effectivePerStick);
         }
+        sticksPerRun = splicesPerRun + 1;
       }
-      const horizontalBarsTotal   = horizontalCount * matMultiplier;
-      const horizontalSticksTotal = horizontalBarsTotal * sticksPerBar;
-      const coverageNeeded        = horizontalBarsTotal * horizontalLengthFt;
-      const totalMaterialFt       = horizontalSticksTotal * horizontalStickLength;
-      const lapMaterial           = Math.max(0, totalMaterialFt - coverageNeeded);
+      const horizontalBarsTotal = horizontalCount * matMultiplier;
+      const lapPerRun           = splicesPerRun * horizontalLap;
+      const totalLap            = horizontalBarsTotal * lapPerRun;
+      const coverageNeeded      = horizontalBarsTotal * horizontalLengthFt;
+
+      // Stick count: silently nest pieces when no splicing AND run fits >=2x in a stick.
+      let horizontalSticksTotal;
+      if (splicesPerRun === 0 && horizontalLengthFt > 0
+          && horizontalLengthFt * 2 <= horizontalStickLength) {
+        const piecesPerStick = Math.floor(horizontalStickLength / horizontalLengthFt);
+        horizontalSticksTotal = piecesPerStick > 0
+          ? Math.ceil(horizontalBarsTotal / piecesPerStick)
+          : horizontalBarsTotal;
+      } else {
+        horizontalSticksTotal = horizontalBarsTotal * sticksPerRun;
+      }
+      const totalMaterialFt = horizontalSticksTotal * horizontalStickLength;
+      const totalCutoff     = Math.max(0, totalMaterialFt - coverageNeeded - totalLap);
 
       setOutput('horizontal-runs',    horizontalBarsTotal);
-      setOutput('horizontal-length',  Math.round(horizontalLengthFt));
+      setOutput('horizontal-length',  horizontalLengthFt.toFixed(1));
       setOutput('coverage-needed',    Math.round(coverageNeeded));
-      setOutput('lap-material',       Math.round(lapMaterial));
+      setOutput('lap-material',       Math.round(totalLap));
+      setOutput('cutoff-waste',       Math.round(totalCutoff));
       setOutput('horizontal-sticks',  horizontalSticksTotal);
 
       // ----- Legs -----
@@ -1077,7 +1243,7 @@
           legQty = (Math.ceil(footerLengthFt / 5) + 1) * 3;
         } else {
           const customSpacingFt = getNum('leg-custom-spacing-ft', 0) + getNum('leg-custom-spacing-in', 0) / 12;
-          const legsPerStation  = Math.max(1, Math.floor(getNum('leg-custom-count', 1)));
+          const legsPerStation  = Math.max(0, Math.floor(getNum('leg-custom-count', 1)));
           const stations = customSpacingFt > 0 ? Math.ceil(footerLengthFt / customSpacingFt) + 1 : 1;
           legQty = stations * legsPerStation;
         }
@@ -1101,16 +1267,28 @@
       const legSize        = getField('leg-size')        ? getField('leg-size').value        : '4';
       const uprightSize    = getField('upright-size')    ? getField('upright-size').value    : '4';
 
+      // Cross bar sticks: nest pieces into 20' sticks when length permits.
+      // (Cross bars are always cut, so nesting is the realistic field practice.)
+      let crossbarSticksOrdered;
+      if (crossbarLengthFt > 0 && crossbarTotalQty > 0 && crossbarLengthFt <= 20) {
+        const piecesPerStick20 = Math.floor(20 / crossbarLengthFt);
+        crossbarSticksOrdered = piecesPerStick20 > 0
+          ? Math.ceil(crossbarTotalQty / piecesPerStick20)
+          : crossbarTotalQty;
+      } else {
+        crossbarSticksOrdered = Math.ceil(crossbarTotalFt / 20);
+      }
+
       const sizeMap = {};
       function addToSize(size, ft, sticks) {
         if (!sizeMap[size]) sizeMap[size] = { ft: 0, sticks: 0 };
         sizeMap[size].ft += ft;
         sizeMap[size].sticks += sticks;
       }
-      addToSize(crossbarSize,   crossbarTotalFt,   Math.ceil(crossbarTotalFt / 20));
-      addToSize(horizontalSize, totalMaterialFt,   horizontalSticksTotal);
-      addToSize(legSize,        legTotalFt,        Math.ceil(legTotalFt / 20));
-      addToSize(uprightSize,    uprightTotalFt,    Math.ceil(uprightTotalFt / 20));
+      addToSize(crossbarSize,   crossbarTotalQty * crossbarLengthFt, crossbarSticksOrdered);
+      addToSize(horizontalSize, totalMaterialFt,                     horizontalSticksTotal);
+      addToSize(legSize,        legTotalFt,                          Math.ceil(legTotalFt / 20));
+      addToSize(uprightSize,    uprightTotalFt,                      Math.ceil(uprightTotalFt / 20));
 
       const sortedSizes = Object.keys(sizeMap).sort((a, b) => parseInt(a) - parseInt(b));
       let html = '';
@@ -1400,6 +1578,791 @@
     }
 
     updateSectionCountRadios();
+
+    // ====================================================================
+    // JOB NOTES PARSER (deterministic, no AI, no network)
+    // ====================================================================
+    async function parseJobNotes() {
+      const raw = document.getElementById('parse-input').value;
+      const resultEl = document.getElementById('parse-result');
+      if (!raw.trim()) {
+        resultEl.innerHTML = '<div class="skipped">Nothing to parse.</div>';
+        return;
+      }
+
+      const filled = [];
+      const skipped = [];
+
+      const text = raw
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const setVal = (el, val) => {
+        if (!el) return false;
+        el.value = val;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+      };
+      const setRadio = (el) => {
+        if (!el) return false;
+        el.checked = true;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+      };
+      const log = (field, value) => filled.push({ field, value: String(value) });
+      const skip = (msg) => skipped.push(msg);
+
+      // ---- ADDRESS ----
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length > 0) {
+        const firstLine = lines[0];
+        // Accept CamelCase too (RamsGate, GroveTrace) — at least one capital letter
+        // followed by some lowercase, OR multiple words. Reject pure numeric/gibberish.
+        const hasRealWord = /[A-Z][a-z]/.test(firstLine) || /\b[A-Z][a-z]{2,}\b/.test(firstLine);
+        if (firstLine.length < 80 && firstLine.length > 2 && hasRealWord
+            && !/^\s*(x?\s*\d+|\d+\s*(ft|yards?|hours?))/i.test(firstLine)
+            && !/yards?|pump|bulkhead|rebar|footer/i.test(firstLine)) {
+          const addrEl = document.getElementById('address');
+          if (addrEl && !addrEl.value) {
+            setVal(addrEl, firstLine);
+            log('Address', firstLine);
+          }
+        }
+      }
+
+      // ---- BUILDER ----
+      const builderMatch = text.match(/builder\s*[:=]\s*([A-Z][^\n,;.]{2,40})/i);
+      if (builderMatch) {
+        const builderEl = document.getElementById('builder');
+        if (setVal(builderEl, builderMatch[1].trim())) log('Builder', builderMatch[1].trim());
+      } else {
+        const standaloneBuilder = lines.find(l =>
+          /^[A-Z][a-zA-Z\s&]{2,40}\s+(builders?|custom homes|construction)\s*$/i.test(l.trim())
+          && l.trim().split(/\s+/).length <= 5
+        );
+        if (standaloneBuilder) {
+          const builderEl = document.getElementById('builder');
+          if (setVal(builderEl, standaloneBuilder.trim())) log('Builder', standaloneBuilder.trim());
+        }
+      }
+
+      // ---- HOUSE LINEAR FEET ----
+      let lengthFt = null;
+      const lfPatterns = [
+        /(\d+)\s*(?:total\s+)?lin(?:ear|er)?\s*(?:foot|ft|feet)\s+(?:for|of)\s+(?:the\s+)?house/i,
+        /(\d+)\s*(?:total\s+)?lin(?:ear|er)?\s*(?:foot|ft|feet)/i,
+        /^\s*(\d+)\s*ft\s*$/im,
+        /house[^.]*?(\d+)\s*ft\b/i
+      ];
+      for (const p of lfPatterns) {
+        const m = text.match(p);
+        if (m) { lengthFt = parseInt(m[1], 10); break; }
+      }
+      if (lengthFt !== null && (lengthFt < 5 || lengthFt > 5000)) lengthFt = null;
+      if (lengthFt !== null) {
+        const sec1 = document.getElementById('section-1');
+        const lenInput = sec1.querySelector('[data-footer-dim="length-ft"]');
+        if (setVal(lenInput, lengthFt)) log('Section 1 Length (ft)', lengthFt);
+      }
+
+      // ---- CONTINUAL REBAR ----
+      // Match "x3 continual", "x 3 continuous", and common typos like "contiual", "contnual"
+      const continualMatch = text.match(/x\s*(\d+)\s*(?:#\s*(\d+)\s*)?(?:rebar\s+)?(?:cont[a-z]{2,4}al|cont[a-z]{2,4}ous)/i);
+      if (continualMatch) {
+        const barCount = continualMatch[1];
+        const barSize = continualMatch[2] || '4';
+        const stickMatch = text.match(/(\d+)\s*(?:sticks?\s+)?(?:rebar|#\s*\d+)\s+for\s+the\s+house/i)
+                       || text.match(/(\d+)\s*sticks?\s+#\s*(\d+)/i);
+        const sec1 = document.getElementById('section-1');
+        const stdContent = sec1.querySelector('.standard-footing-content');
+        if (stickMatch) {
+          const rebarQtyInput = stdContent.querySelectorAll('input[type="number"][step="10"]')[0];
+          if (setVal(rebarQtyInput, parseInt(stickMatch[1], 10))) {
+            log('Section 1 Rebar Qty', stickMatch[1] + ' sticks');
+          }
+          const rebarSizeSel = stdContent.querySelector('select[aria-label="Rebar Size"]');
+          if (rebarSizeSel) {
+            const opt = '#' + barSize;
+            for (const o of rebarSizeSel.options) {
+              if (o.text === opt) { rebarSizeSel.value = o.value; log('Section 1 Rebar Size', opt); break; }
+            }
+          }
+        } else {
+          skip('Found "x' + barCount + ' #' + barSize + ' continual" but no total stick count. Add e.g. "160 rebar for the house" to fill the Rebar Qty field.');
+        }
+        const notesArea = sec1.querySelectorAll('textarea')[sec1.querySelectorAll('textarea').length - 1];
+        if (notesArea && !notesArea.value.includes('continual')) {
+          const note = 'x' + barCount + ' #' + barSize + ' continuous longitudinal bars in footer.';
+          notesArea.value = (notesArea.value ? notesArea.value + ' ' : '') + note;
+          log('Section 1 Notes', note);
+        }
+      }
+
+      // ---- BULKHEADS ----
+      const bulkMatch = text.match(/(\d+)\s+bulkheads?(?:\s+(?:[\d.\s\-x']+(?:wide|tall)?\s*)*)?/i);
+      if (bulkMatch) {
+        const bulkQty = parseInt(bulkMatch[1], 10);
+        const sec1 = document.getElementById('section-1');
+        const bulkInputs = Array.from(sec1.querySelectorAll('input[aria-label="Bulkheads Quantity"]'));
+        if (bulkInputs[0] && setVal(bulkInputs[0], bulkQty)) {
+          log('Section 1 Bulkheads Qty', bulkQty);
+          const heightAfterBulk = bulkMatch[0].match(/(\d+(?:\.\d+)?)\s*(?:'|ft|foot|feet)\b/i);
+          if (heightAfterBulk) {
+            const hInput = sec1.querySelector('input[aria-label="Bulkheads Height"]');
+            if (setVal(hInput, parseFloat(heightAfterBulk[1]))) {
+              log('Section 1 Bulkheads Height', heightAfterBulk[1] + ' ft');
+            }
+          }
+        }
+      }
+
+      // ---- CONCRETE: IMI yards ----
+      let totalYards = 0;
+      const yardMatches = [];
+      const yardRegex = /(\d+)\s*yards?\s+(?:of\s+concrete\s+)?(?:from|with)?\s*imi|imi\s+(\d+)\s*yards?/gi;
+      let yardM;
+      while ((yardM = yardRegex.exec(text)) !== null) {
+        const yards = parseInt(yardM[1] || yardM[2], 10);
+        if (yards > 0 && yards < 10000) {
+          yardMatches.push(yards);
+          totalYards += yards;
+        }
+      }
+      if (yardMatches.length > 0) {
+        const yardsInput = document.getElementById('yards-tens');
+        if (setVal(yardsInput, totalYards)) {
+          if (yardMatches.length > 1) {
+            log('Total Yards (IMI)', totalYards + ' (' + yardMatches.join(' + ') + ' across ' + yardMatches.length + ' pours)');
+          } else {
+            log('Yards (IMI)', totalYards);
+          }
+        }
+        setRadio(document.getElementById('imi'));
+        log('Concrete Co.', 'IMI');
+      }
+
+      // ---- PUMP ----
+      const pumpPatterns = [
+        { regex: /(\d+)\s*(?:m|meter|metre)\s+(?:pump\s+)?(?:from\s+)?brundage/i, co: 'brundage' },
+        { regex: /brundage\s+(\d+)\s*(?:m|meter|metre)/i, co: 'brundage' },
+        { regex: /(\d+)\s*m\s+brundage/i, co: 'brundage' },
+        { regex: /(?:concrete\s+pump\s+partners|cpp)\s+(\d+)\s*(?:m|meter|metre)/i, co: 'cpp' },
+        { regex: /(\d+)\s*(?:m|meter|metre)\s+(?:pump\s+)?(?:from\s+)?(?:concrete\s+pump\s+partners|cpp)/i, co: 'cpp' }
+      ];
+      const pumpsFound = [];
+      for (const p of pumpPatterns) {
+        const m = text.match(p.regex);
+        if (m && !pumpsFound.find(pf => pf.co === p.co)) {
+          pumpsFound.push({ co: p.co, size: m[1] });
+        }
+      }
+      if (pumpsFound.length === 1) {
+        const p = pumpsFound[0];
+        if (p.co === 'brundage') {
+          setRadio(document.getElementById('pump-brundage'));
+          setVal(document.getElementById('pump-other'), p.size + 'M');
+          log('Pump', 'Brundage ' + p.size + 'M');
+        } else {
+          setRadio(document.getElementById('pump-cpp'));
+          setVal(document.getElementById('pump-other'), p.size + 'M');
+          log('Pump', 'CPP ' + p.size + 'M');
+        }
+      } else if (pumpsFound.length > 1) {
+        const summary = pumpsFound.map(p => (p.co === 'brundage' ? 'Brundage' : 'CPP') + ' ' + p.size + 'M').join(' + ');
+        setVal(document.getElementById('pump-other'), summary);
+        log('Pumps (multiple)', summary + ' — verify which to tick');
+      }
+
+      // ---- SUPPLIES ----
+      // Paint
+      const paintM = text.match(/(\d+)\s*(box(?:es)?|cans?|bxs?)\s+(?:of\s+)?paint|paint\s*[:=]?\s*(\d+)\s*(box(?:es)?|cans?|bxs?)/i);
+      if (paintM) {
+        const qty = parseInt(paintM[1] || paintM[3], 10);
+        const unit = (paintM[2] || paintM[4] || '').toLowerCase();
+        const isCan = /can/.test(unit);
+        const labelText = isCan ? 'Paint Cans Quantity' : 'Paint Boxes Quantity';
+        const inp = document.querySelector('input[aria-label="' + labelText + '"]');
+        if (setVal(inp, qty)) log('Paint', qty + ' ' + (isCan ? 'cans' : 'boxes'));
+      }
+
+      // Chairs
+      const chairsM = text.match(/(\d+)\s*(?:box(?:es)?|bxs?)\s+(?:of\s+)?chairs/i);
+      if (chairsM) {
+        const inp = document.querySelector('input[aria-label="Chairs Boxes Quantity"]');
+        if (setVal(inp, parseInt(chairsM[1], 10))) log('Chairs (boxes)', chairsM[1]);
+      }
+
+      // Grade pins
+      const pinsM = text.match(/(\d+)\s*(?:box(?:es)?|bxs?)\s+(?:of\s+)?(?:grade\s+)?pins/i);
+      if (pinsM) {
+        const inp = document.querySelector('input[aria-label="Grade Pins Boxes Quantity"]');
+        if (setVal(inp, parseInt(pinsM[1], 10))) log('Grade Pins (boxes)', pinsM[1]);
+      }
+
+      // ---- EQUIPMENT ----
+      // Use line-bounded text for descriptions so they don't slurp the rest of the input.
+      function captureDescription(equipmentRegex) {
+        // Find each line in the original raw input that matches; pull description up to next clause.
+        for (const ln of lines) {
+          const m = ln.match(equipmentRegex);
+          if (m) {
+            const hrs = parseFloat(m[1]);
+            // Description: text after the keyword, trimmed to a sensible length, stop at common separators
+            let desc = (m[2] || '').trim();
+            // Stop at common breakpoints we know start unrelated content
+            desc = desc.split(/\s+(?:x\s*\d|\d+\s*(?:box|cans?|yards?|hours?)|imi\b|brundage\b|cpp\b)/i)[0].trim();
+            // Hard cap at 80 chars
+            if (desc.length > 80) desc = desc.slice(0, 80).replace(/\s+\S*$/, '') + '...';
+            return { hrs, desc };
+          }
+        }
+        return null;
+      }
+
+      // Helper: append a line to Section 1 Notes
+      function appendSection1Note(line) {
+        const sec1 = document.getElementById('section-1');
+        const tas = sec1.querySelectorAll('textarea');
+        const notesTa = tas[tas.length - 1];
+        if (notesTa) {
+          notesTa.value = (notesTa.value ? notesTa.value + '\n' : '') + line;
+        }
+      }
+
+      const minixCap = captureDescription(/x?\s*(\d+(?:\.\d+)?)\s*hours?\s+(?:of\s+(?:extra\s+)?)?machine\s+time(?:[^.]*?(?:to\s+|due\s+to\s+|for\s+)(.+))?/i);
+      if (minixCap) {
+        const minixHours = document.querySelector('input[aria-label="MiniX Hours"]');
+        if (setVal(minixHours, minixCap.hrs)) {
+          log('MiniX Hours', minixCap.hrs);
+          if (minixCap.desc) {
+            const minixDesc = document.querySelector('input[aria-label="MiniX Description"]');
+            if (setVal(minixDesc, minixCap.desc)) log('MiniX Description', minixCap.desc);
+            const noteLine = 'MiniX ' + minixCap.hrs + ' hrs — ' + minixCap.desc;
+            appendSection1Note(noteLine);
+            log('Section 1 Notes (MiniX)', noteLine);
+          }
+        }
+      }
+
+      const hammerCap = captureDescription(/x?\s*(\d+(?:\.\d+)?)\s*hours?\s+(?:of\s+)?hammer(?:\s+time)?(?:[^.]*?(?:to\s+|for\s+)(.+))?/i);
+      if (hammerCap) {
+        const hammerHours = document.querySelector('input[aria-label="Hammer Hours"]');
+        if (setVal(hammerHours, hammerCap.hrs)) {
+          log('Hammer Hours', hammerCap.hrs);
+          if (hammerCap.desc) {
+            const hammerDesc = document.querySelector('input[aria-label="Hammer Description"]');
+            if (setVal(hammerDesc, hammerCap.desc)) log('Hammer Description', hammerCap.desc);
+            const noteLine = 'Hammer ' + hammerCap.hrs + ' hrs — ' + hammerCap.desc;
+            appendSection1Note(noteLine);
+            log('Section 1 Notes (Hammer)', noteLine);
+          }
+        }
+      }
+
+      // ---- RETAINING WALL DETECTION ----
+      const rwIndicators = [
+        /retaining\s+wall/i,
+        /\d+\s*on\s*\d+\s*#\s*\d/i,
+        /\bl\s+bars?\b/i
+      ];
+      const hasRW = rwIndicators.some(p => p.test(text));
+      if (hasRW && !document.getElementById('ai-enabled').checked) {
+        skip('Retaining wall content detected. RW sections need dimensions, mat config, cross bars, L bars — too many fields to safely guess. Add a section, tick the Retaining Wall toggle, and fill manually. (Tip: enable AI cleanup to auto-create RW sections.)');
+      }
+
+      // ---- CREW MENTIONS ----
+      const crewMentions = [];
+      const crewLaborM = text.match(/(\d+(?:\.\d+)?)\s*hours?\s+(?:of\s+)?(?:extra\s+)?labor/i);
+      if (crewLaborM) crewMentions.push(crewLaborM[1] + ' hrs extra labor');
+      const layoutM = text.match(/(\d+(?:\.\d+)?)\s*hours?\s+(?:to\s+)?(?:square\s+up|layout|lay\s+out)/i);
+      if (layoutM) crewMentions.push(layoutM[1] + ' hrs layout');
+      if (crewMentions.length > 0) {
+        skip('Crew time mentioned: ' + crewMentions.join(', ') + '. Add to Crew Info table manually with names.');
+      }
+
+      // ---- RENDER ----
+      function render(aiAdded, aiError, aiPending) {
+        let html = '';
+        if (filled.length > 0) {
+          html += '<div class="filled"><strong>✓ Filled ' + filled.length + ' field' + (filled.length === 1 ? '' : 's') + ':</strong><ul>';
+          filled.forEach(f => {
+            html += '<li><code>' + escapeHtml(f.field) + '</code> &rarr; ' + escapeHtml(f.value) + '</li>';
+          });
+          html += '</ul></div>';
+        }
+        if (aiPending) {
+          html += '<div class="ai-added"><strong>🤖 AI cleanup in progress&hellip;</strong></div>';
+        }
+        if (aiAdded && aiAdded.length > 0) {
+          html += '<div class="ai-added"><strong>🤖 AI added ' + aiAdded.length + ' item' + (aiAdded.length === 1 ? '' : 's') + ':</strong><ul>';
+          aiAdded.forEach(a => {
+            html += '<li><code>' + escapeHtml(a.field) + '</code> &rarr; ' + escapeHtml(a.value.length > 200 ? a.value.slice(0, 200) + '…' : a.value) + '</li>';
+          });
+          html += '</ul></div>';
+        }
+        if (aiError) {
+          html += '<div class="skipped"><strong>🤖 AI error:</strong> ' + escapeHtml(aiError) + '</div>';
+        }
+        if (skipped.length > 0) {
+          html += '<div class="skipped"><strong>⚠ Needs manual entry:</strong><ul>';
+          skipped.forEach(s => { html += '<li>' + escapeHtml(s) + '</li>'; });
+          html += '</ul></div>';
+        }
+        if (filled.length === 0 && skipped.length === 0 && (!aiAdded || aiAdded.length === 0)) {
+          html = '<div class="skipped">Nothing recognized. Try keywords like "ft", "yards imi", "Brundage 46m", "5 box chairs".</div>';
+        }
+        resultEl.innerHTML = html;
+      }
+
+      // First render: deterministic results
+      const aiOn = document.getElementById('ai-enabled').checked;
+      render(null, null, aiOn);
+
+      // Optional AI follow-up pass
+      if (aiOn) {
+        try {
+          const summary = filled.map(f => '- ' + f.field + ': ' + f.value).join('\n') || '(none)';
+          const aiOut = await callGemini(raw, summary);
+          const aiAdded = applyGeminiOutput(aiOut);
+          render(aiAdded, null, false);
+        } catch (e) {
+          render(null, e.message || String(e), false);
+        }
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
+    }
+
+    // ====================================================================
+    // GEMINI AI INTEGRATION
+    // ====================================================================
+    const GEMINI_KEY_STORAGE = 'k_concrete_form_gemini_key';
+    const GEMINI_AI_ENABLED = 'k_concrete_form_ai_enabled';
+
+    // Restore saved settings on load
+    (function restoreAiSettings() {
+      try {
+        const savedKey = localStorage.getItem(GEMINI_KEY_STORAGE);
+        if (savedKey) {
+          document.getElementById('gemini-key').value = savedKey;
+        }
+        const aiPref = localStorage.getItem(GEMINI_AI_ENABLED);
+        if (aiPref !== null) {
+          document.getElementById('ai-enabled').checked = aiPref === '1';
+        }
+        // else: leave the embedded default-checked state alone
+      } catch (e) { /* localStorage unavailable */ }
+    })();
+
+    function toggleAiSettings() {
+      const panel = document.getElementById('ai-settings-panel');
+      panel.style.display = panel.style.display === 'none' ? '' : 'none';
+    }
+
+    function saveGeminiKey() {
+      const key = document.getElementById('gemini-key').value.trim();
+      if (!key) {
+        alert('Paste a key first.');
+        return;
+      }
+      try {
+        localStorage.setItem(GEMINI_KEY_STORAGE, key);
+        alert('Key saved to this browser.');
+      } catch (e) {
+        alert('Could not save: ' + e.message);
+      }
+    }
+
+    function clearGeminiKey() {
+      try {
+        localStorage.removeItem(GEMINI_KEY_STORAGE);
+      } catch (e) { /* ignore */ }
+      document.getElementById('gemini-key').value = '';
+      alert('Key cleared.');
+    }
+
+    function onAiToggle() {
+      const on = document.getElementById('ai-enabled').checked;
+      try {
+        localStorage.setItem(GEMINI_AI_ENABLED, on ? '1' : '0');
+      } catch (e) { /* ignore */ }
+    }
+
+    async function callGemini(rawNotes, parsedSummary) {
+      // Function name kept as callGemini for compatibility, but routes to GitHub Models.
+      const key = (document.getElementById('gemini-key').value || '').trim();
+      if (!key) {
+        throw new Error('No GitHub PAT. Open AI Settings and paste your token.');
+      }
+
+      const prompt =
+        "You are helping fill out a concrete construction job ticket. Your job is to extract DESCRIPTIVE INFORMATION " +
+        "that the deterministic parser missed. The parser already filled the structured fields (lengths, yards, " +
+        "pumps, supplies, equipment hours). Do NOT re-extract those. Only return content that belongs in NOTES " +
+        "fields or descriptive text fields.\n\n" +
+        "PARSER ALREADY FILLED THESE STRUCTURED FIELDS:\n" + parsedSummary + "\n\n" +
+        "RAW JOB NOTES:\n" + rawNotes + "\n\n" +
+        "Return STRICT JSON with these fields (omit a field if you have nothing for it):\n" +
+        "{\n" +
+        '  "additional_notes": "general job-wide notes that don\'t fit any specific field. THIS IS WHERE EQUIPMENT DESCRIPTIONS GO — full sentences explaining WHY MiniX/Hammer time was needed, since the small Description input truncates. Format: \'MiniX 8 hrs — clean out safe room pit the builder excavation team messed up, and re-dig for wall guys to put in panels.\' Also: vendors (Whitecap Supply), incident reports (rain delay, survey error), or general project context.",\n' +
+        '  "section_1_notes": "FORMED WORK / SCOPE callouts on the main house section. Examples: large bulkheads formed at various heights, safe room walls formed both sides 100 ft total, steps formed, etc. Use this for structural / formed-in-place work that is part of the scope but does not fit a standard field. Do NOT include rebar counts, equipment hours, or supplies here.",\n' +
+        '  "minix_description": "ULTRA-SHORT (3-6 words) summary for the small Description input box, e.g. \'safe room pit cleanup\'. The full prose belongs in additional_notes.",\n' +
+        '  "hammer_description": "ULTRA-SHORT (3-6 words) summary for the small Description input box, e.g. \'rock in safe room\'. The full prose belongs in additional_notes.",\n' +
+        '  "crew_notes": "any people, names, or hours mentioned that need a crew row",\n' +
+        '  "fireplaces": [\n' +
+        '    {"description": "concise spec like \'8\\\\\' x 5\\\\\', rebar grid each way at 1 ft, 12\\\\\\" depth\'"}\n' +
+        '  ],\n' +
+        '  "porch_pads": [\n' +
+        '    {"description": "concise spec like \'Back porch pad 8\\\\\' x 6\\\\\' x 12\\\\\\" deep, rebar grid each way at 1 ft\'"}\n' +
+        '  ],\n' +
+        '  "consumables": [\n' +
+        '    {"item": "purchased consumable e.g. \'Plastic sheeting\' or \'Cement bags\' or \'Tie wire\'", "qty": <number>, "notes": "details if any"}\n' +
+        '  ],\n' +
+        '  "retaining_walls": [\n' +
+        '    {\n' +
+        '      "label": "short name like \'Back Porch RW\' or \'RW Footer #1\'",\n' +
+        '      "length_ft": <number>,\n' +
+        '      "width_in": <number, the footer width converted to inches; e.g. 3\'6\\" = 42>,\n' +
+        '      "mat": "single" | "double" | "triple",\n' +
+        '      "horizontal_size": <rebar size number, e.g. 4 for #4>,\n' +
+        '      "horizontal_count_per_mat": <number; e.g. \\"4 on 4 #4\\" means 4 per mat>,\n' +
+        '      "crossbar_size": <rebar size number; default 4 if not specified>,\n' +
+        '      "crossbar_spacing_in": <number; \\"at one ft\\" = 12, \\"at 10\\\\\\"\\" = 10>,\n' +
+        '      "has_cross_bars": <true | false; default true. Set false if the wall has only longitudinal bars with no cross/transverse bars mentioned, or if the wall is short/under 4 ft with only continuous bars>,\n' +
+        '      "has_uprights": <true | false; default true. Set false if user says \\"no uprights\\", \\"no L bars\\", or wall is under 4 ft with only continuous bars>,\n' +
+        '      "upright_size": <rebar size number, only if has_uprights is true>,\n' +
+        '      "upright_spacing_in": <number, only if has_uprights is true>,\n' +
+        '      "upright_length_ft": <number, default 4 if not specified>,\n' +
+        '      "bulkheads_qty": <number, omit if not mentioned>,\n' +
+        '      "notes": "anything special: \\"5 ft long L bars bent at 4 ft\\", \\"wall under 4 ft tall, no uprights needed\\""\n' +
+        '    }\n' +
+        '  ]\n' +
+        "}\n\n" +
+        "Rules:\n" +
+        "- Be concise. No marketing language. Match the user's blunt tone.\n" +
+        "- DO NOT make up information. If you didn't see it in the notes, omit the field.\n" +
+        "- DO NOT repeat info already in the parser's structured fields.\n" +
+        "- DO NOT put rebar counts, stick counts, yards, hours, supplies, lengths, or pump info into additional_notes or section_1_notes — those are structured data that belong in their own fields.\n" +
+        "- consumables = ONLY purchased materials like plastic sheeting, cement bags, tie wire, fasteners, sleeves. NOT formed structures (bulkheads, fireplaces, safe room walls). NOT rebar (already counted elsewhere). If unsure, do NOT include it.\n" +
+        "- section_1_notes = formed/structural callouts that are part of the job scope. Use plain prose. Examples: large bulkheads formed at various heights, safe room walls formed both sides 100 ft at 18 inches tall, steps formed, etc.\n" +
+        "- additional_notes = full descriptive context. Always include MiniX/Hammer descriptions here as full sentences if they were mentioned. The small Description input truncates, so duplicate the prose here for the record.\n" +
+        "- Fireplaces/porch pads: extract each one separately. Common patterns: '8x5 Fireplace', '6x5 Fireplace', 'Back porch pad 8 x 6 x 12 deep', 'Elevator pad'. Multiple fireplaces or pads beyond the first go in section_1_notes (not consumables).\n" +
+        "- For retaining walls: '4 on 4 #4' means double mat with 4 #4 horizontal bars per mat. '6 on 6 #4' = double mat, 6 #4 per mat. If only one number is given (e.g. 'x3 #4'), that's single mat.\n" +
+        "- Width: footer widths like \"3'6\\\"\" must be converted to total inches (3*12+6=42).\n" +
+        "- If a wall explicitly says no uprights/L-bars (e.g. 'wall under 4 ft, no uprights'), set has_uprights=false.\n" +
+        "- CRITICAL — DO NOT INVENT REBAR SPECS. If the user only mentioned 'x3 #4 bars' for a short wall with NO mention of cross bars, uprights, or L bars, then set has_cross_bars=false AND has_uprights=false. Do not assume there are cross bars at 12 inch spacing or default uprights — those things must be explicitly mentioned by the user.\n" +
+        "- A wall described as 'below 4 ft tall' or 'under 4 ft' with only longitudinal bars (e.g. 'x3 #4 bars only') is a SHORT FOOTER WALL: it has horizontal bars but NO cross bars and NO uprights. In that case set has_cross_bars=false and has_uprights=false.\n" +
+        "- A wall with explicit cross bar AND upright specs ('cross bars at 12, uprights at 12') has both. has_cross_bars=true, has_uprights=true.\n" +
+        "- Return ONLY the JSON object, no markdown fences, no preamble.";
+
+      const url = 'https://models.github.ai/inference/chat/completions';
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'Authorization': 'Bearer ' + key
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.2,
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        let msg = 'GitHub Models error ' + res.status;
+        try {
+          const j = JSON.parse(errText);
+          if (j.error && j.error.message) msg = j.error.message;
+          else if (j.message) msg = j.message;
+        } catch (e) {
+          if (errText && errText.length < 200) msg += ': ' + errText;
+        }
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      const txt = data.choices && data.choices[0]
+        && data.choices[0].message && data.choices[0].message.content;
+      if (!txt) throw new Error('GitHub Models returned empty response.');
+
+      // Parse JSON (defend against accidental fences)
+      const cleaned = txt.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        throw new Error('GitHub Models returned non-JSON output: ' + cleaned.slice(0, 200));
+      }
+    }
+
+    // Apply Gemini's JSON output to the form. Returns array of "ai-added" log entries.
+    function applyGeminiOutput(aiOut) {
+      const added = [];
+
+      // additional_notes -> Additional Notes textarea (append, don't overwrite)
+      if (aiOut.additional_notes) {
+        const ta = document.getElementById('additional-notes');
+        if (ta) {
+          ta.value = (ta.value ? ta.value + '\n\n' : '') + aiOut.additional_notes;
+          added.push({ field: 'Additional Notes', value: aiOut.additional_notes });
+        }
+      }
+
+      // section_1_notes -> Section 1's notes textarea (append)
+      if (aiOut.section_1_notes) {
+        const sec1 = document.getElementById('section-1');
+        const tas = sec1.querySelectorAll('textarea');
+        const notesTa = tas[tas.length - 1]; // last textarea is Section Notes
+        if (notesTa) {
+          notesTa.value = (notesTa.value ? notesTa.value + '\n\n' : '') + aiOut.section_1_notes;
+          added.push({ field: 'Section 1 Notes', value: aiOut.section_1_notes });
+        }
+      }
+
+      // minix_description (only if currently empty)
+      if (aiOut.minix_description) {
+        const inp = document.querySelector('input[aria-label="MiniX Description"]');
+        if (inp && !inp.value) {
+          inp.value = aiOut.minix_description;
+          added.push({ field: 'MiniX Description', value: aiOut.minix_description });
+        }
+      }
+
+      // hammer_description (only if currently empty)
+      if (aiOut.hammer_description) {
+        const inp = document.querySelector('input[aria-label="Hammer Description"]');
+        if (inp && !inp.value) {
+          inp.value = aiOut.hammer_description;
+          added.push({ field: 'Hammer Description', value: aiOut.hammer_description });
+        }
+      }
+
+      // crew_notes -> Additional Notes (don't auto-add crew rows; let user verify)
+      if (aiOut.crew_notes) {
+        const ta = document.getElementById('additional-notes');
+        if (ta) {
+          const tag = '[Crew] ' + aiOut.crew_notes;
+          ta.value = (ta.value ? ta.value + '\n' : '') + tag;
+          added.push({ field: 'Crew Notes (in Additional Notes)', value: aiOut.crew_notes });
+        }
+      }
+
+      // Helper: append a line to Section 1 Notes textarea
+      const appendSec1Note = (line) => {
+        const sec1 = document.getElementById('section-1');
+        const tas = sec1.querySelectorAll('textarea');
+        const notesTa = tas[tas.length - 1];
+        if (notesTa && line) {
+          notesTa.value = (notesTa.value ? notesTa.value + '\n' : '') + line;
+        }
+      };
+
+      // fireplaces -> first into Fireplace input, extras into Section 1 Notes (formed work)
+      if (Array.isArray(aiOut.fireplaces) && aiOut.fireplaces.length > 0) {
+        const sec1 = document.getElementById('section-1');
+        const fireplaceInput = sec1.querySelector('input[aria-label="Fireplace"]');
+        if (fireplaceInput && aiOut.fireplaces[0].description) {
+          fireplaceInput.value = aiOut.fireplaces[0].description;
+          added.push({ field: 'Section 1 Fireplace', value: aiOut.fireplaces[0].description });
+        }
+        // Extras go in Section 1 Notes (it's formed work, not a consumable)
+        aiOut.fireplaces.slice(1).forEach((fp, i) => {
+          if (fp.description) {
+            const line = 'Additional fireplace: ' + fp.description;
+            appendSec1Note(line);
+            added.push({ field: 'Section 1 Notes (extra fireplace)', value: line });
+          }
+        });
+      }
+
+      // porch_pads -> first into Porch Pad input, extras into Section 1 Notes
+      if (Array.isArray(aiOut.porch_pads) && aiOut.porch_pads.length > 0) {
+        const sec1 = document.getElementById('section-1');
+        const porchInput = sec1.querySelector('input[aria-label="Porch Pad"]');
+        if (porchInput && aiOut.porch_pads[0].description) {
+          porchInput.value = aiOut.porch_pads[0].description;
+          added.push({ field: 'Section 1 Porch Pad', value: aiOut.porch_pads[0].description });
+        }
+        aiOut.porch_pads.slice(1).forEach((pp, i) => {
+          if (pp.description) {
+            const line = 'Additional porch pad: ' + pp.description;
+            appendSec1Note(line);
+            added.push({ field: 'Section 1 Notes (extra porch pad)', value: line });
+          }
+        });
+      }
+
+      // consumables -> fill rows in Section 1's Additional Materials table
+      // (PURCHASED materials only: plastic, cement bags, tie wire, fasteners, sleeves)
+      if (Array.isArray(aiOut.consumables) && aiOut.consumables.length > 0) {
+        const sec1 = document.getElementById('section-1');
+        const itemInputs = Array.from(sec1.querySelectorAll('input[aria-label^="Additional Material Item"]'));
+        const qtyInputs  = Array.from(sec1.querySelectorAll('input[aria-label^="Additional Material Quantity"]'));
+        const noteInputs = Array.from(sec1.querySelectorAll('input[aria-label^="Additional Material Notes"]'));
+        aiOut.consumables.forEach((c, i) => {
+          if (i < itemInputs.length) {
+            if (itemInputs[i] && c.item) itemInputs[i].value = c.item;
+            if (qtyInputs[i]  && c.qty !== undefined && c.qty !== null) qtyInputs[i].value = c.qty;
+            if (noteInputs[i] && c.notes) noteInputs[i].value = c.notes;
+            added.push({
+              field: 'Add\'l Material #' + (i + 1),
+              value: (c.item || '') + (c.qty ? ' qty=' + c.qty : '') + (c.notes ? ' — ' + c.notes : '')
+            });
+          } else {
+            // Overflow into Section 1 Notes
+            const line = '[Consumable] ' + (c.item || '') + (c.qty ? ' qty=' + c.qty : '') + (c.notes ? ' — ' + c.notes : '');
+            appendSec1Note(line);
+            added.push({ field: 'Section 1 Notes (extra consumable)', value: line });
+          }
+        });
+      }
+
+      // retaining_walls -> auto-create RW sections, fill them in
+      if (Array.isArray(aiOut.retaining_walls) && aiOut.retaining_walls.length > 0) {
+        aiOut.retaining_walls.forEach((rw, idx) => {
+          // Add a new section
+          addSection();
+          const newSec = document.querySelector('#sections-container .section:last-child');
+          if (!newSec) return;
+          const sectionNum = newSec.id.replace('section-', '');
+
+          // Toggle RW mode on
+          const toggleBox = newSec.querySelector('input[id^="retaining-wall-toggle-"]');
+          if (toggleBox) {
+            toggleBox.checked = true;
+            toggleRetainingWall(toggleBox);
+          }
+
+          // Set label in section title
+          if (rw.label) {
+            const titleEl = newSec.querySelector('.section-title');
+            if (titleEl) {
+              titleEl.textContent = 'Footing Section ' + sectionNum + ' — ' + rw.label + ' (Retaining Wall)';
+            }
+          }
+
+          // Footer dimensions
+          if (typeof rw.length_ft === 'number') {
+            const lenInp = newSec.querySelector('[data-footer-dim="length-ft"]');
+            if (lenInp) { lenInp.value = rw.length_ft; lenInp.dispatchEvent(new Event('input', { bubbles: true })); }
+          }
+          if (typeof rw.width_in === 'number') {
+            const widInp = newSec.querySelector('[data-footer-dim="width-in"]');
+            if (widInp) { widInp.value = rw.width_in; widInp.dispatchEvent(new Event('input', { bubbles: true })); }
+          }
+
+          // Mat config
+          const matChoice = (rw.mat || '').toLowerCase();
+          if (matChoice === 'double' || matChoice === 'triple') {
+            const matRadio = newSec.querySelector('input[id^="rw-mat-' + matChoice + '-"]');
+            if (matRadio) { matRadio.checked = true; matRadio.dispatchEvent(new Event('change', { bubbles: true })); }
+          }
+
+          // Horizontal rebar
+          const setRwField = (name, val) => {
+            const el = newSec.querySelector('[data-rw-field="' + name + '"]');
+            if (el && val !== undefined && val !== null) {
+              el.value = String(val);
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          };
+
+          if (rw.horizontal_size) setRwField('horizontal-size', String(rw.horizontal_size));
+          if (rw.horizontal_count_per_mat) setRwField('horizontal-count', rw.horizontal_count_per_mat);
+
+          // Cross bars — only fill if user actually mentioned them (has_cross_bars !== false)
+          if (rw.has_cross_bars === false) {
+            // Zero out crossbar spacing so qty = 0
+            setRwField('crossbar-spacing', '0');
+          } else {
+            if (rw.crossbar_size) setRwField('crossbar-size', String(rw.crossbar_size));
+            if (rw.crossbar_spacing_in) setRwField('crossbar-spacing', rw.crossbar_spacing_in);
+          }
+
+          // Uprights / L bars — same logic. Legs are tied to uprights; if no uprights, no legs.
+          if (rw.has_uprights === false) {
+            setRwField('upright-spacing', '0');
+            // Switch leg mode to custom and set count to 0 so legs go away too
+            const legModeSel = newSec.querySelector('[data-rw-field="leg-spacing-mode"]');
+            if (legModeSel) {
+              legModeSel.value = 'custom';
+              legModeSel.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            setRwField('leg-custom-count', '0');
+          } else {
+            if (rw.upright_size) setRwField('upright-size', String(rw.upright_size));
+            if (rw.upright_spacing_in) setRwField('upright-spacing', rw.upright_spacing_in);
+            if (rw.upright_length_ft) setRwField('upright-length-ft', rw.upright_length_ft);
+          }
+
+          // Bulkheads — these live in the part of the section visible in BOTH modes
+          if (typeof rw.bulkheads_qty === 'number' && rw.bulkheads_qty > 0) {
+            const bulkInp = newSec.querySelector('input[aria-label="Bulkheads Quantity"]');
+            if (bulkInp) {
+              bulkInp.value = rw.bulkheads_qty;
+              bulkInp.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+
+          // Section notes
+          if (rw.notes) {
+            const tas = newSec.querySelectorAll('textarea');
+            const notesTa = tas[tas.length - 1];
+            if (notesTa) {
+              notesTa.value = (notesTa.value ? notesTa.value + '\n' : '') + rw.notes;
+            }
+          }
+
+          // Trigger recalc
+          if (toggleBox) recalculateRetainingWall(toggleBox);
+
+          added.push({
+            field: 'Section ' + sectionNum + ' — ' + (rw.label || 'Retaining Wall'),
+            value: (rw.length_ft || '?') + 'ft × ' + (rw.width_in || '?') + 'in, '
+              + (rw.mat || '?') + ' mat, '
+              + (rw.horizontal_count_per_mat || '?') + ' on ' + (rw.horizontal_count_per_mat || '?') + ' #' + (rw.horizontal_size || '?')
+              + (rw.has_uprights === false ? ', no uprights' : ', #' + (rw.upright_size || '?') + ' uprights')
+          });
+        });
+      }
+
+      // ---- JOB TYPE AUTO-TICK ----
+      // Always tick House. Tick Retaining Wall if any RW sections exist on the page.
+      const jobHouse = document.getElementById('job-house');
+      if (jobHouse && !jobHouse.checked) {
+        jobHouse.checked = true;
+        added.push({ field: 'Job Type', value: 'House' });
+      }
+      const hasAnyRw = document.querySelectorAll('#sections-container .section.rw-active').length > 0;
+      const jobRetaining = document.getElementById('job-retaining');
+      if (hasAnyRw && jobRetaining && !jobRetaining.checked) {
+        jobRetaining.checked = true;
+        added.push({ field: 'Job Type', value: 'Retaining Wall' });
+      }
+
+      // ---- SECTION 1 LABEL ----
+      // Re-label Section 1 to "— Main House" so it matches the labeled RW sections.
+      const sec1Title = document.querySelector('#section-1 .section-title');
+      if (sec1Title && !sec1Title.textContent.includes('Main House') && !sec1Title.textContent.includes('Retaining Wall')) {
+        sec1Title.textContent = 'Footing Section 1 — Main House';
+      }
+
+      return added;
+    }
   </script>
 </body>
 </html>
