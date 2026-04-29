@@ -334,6 +334,52 @@
       margin: 4px 0;
       border-radius: 3px;
     }
+    .ai-preview {
+      background: #fffde7;
+      border: 2px solid #fbc02d;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .ai-preview-header {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .ai-preview-summary-label,
+    .ai-preview-json-label,
+    .ai-json-status,
+    .ai-preview-help { display: none; }
+
+    #ai-preview-summary-edit {
+      width: 100%;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      resize: vertical;
+      box-sizing: border-box;
+      line-height: 1.5;
+      background: #fff;
+    }
+    .ai-preview-hint {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+    .ai-preview-hint code {
+      background: #fff;
+      padding: 1px 4px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+    }
+    .ai-preview-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ai-preview-buttons .btn { margin: 0; }
 
     /* ===== PRINT STYLES (one-page) ===== */
     @media print {
@@ -390,13 +436,19 @@
         <span class="parse-icon">📋</span>
         <strong>Paste Job Notes</strong>
         <span class="parse-hint">Voice-to-text or paste raw notes &mdash; click Parse to auto-fill</span>
+        <button class="btn btn-toggle no-print" type="button" onclick="toggleParsePanel()" id="parse-panel-toggle" aria-label="Hide parse panel" style="margin-left:8px;">Hide Panel</button>
       </div>
+      <div id="parse-panel-body">
       <textarea id="parse-input" placeholder="Example:&#10;850 total linear ft for the house&#10;160 rebar #4 x3 continual&#10;34 bulkheads 1' tall&#10;129 yards imi, 53M Brundage pump&#10;5 box chairs, 4 box pins, 5 box paint&#10;8 hours machine time to clean safe room"></textarea>
       <div class="parse-buttons">
         <button class="btn btn-blue no-print" type="button" onclick="parseJobNotes()" aria-label="Parse Notes">Parse Notes</button>
         <label class="ai-toggle-label">
           <input type="checkbox" id="ai-enabled" checked onchange="onAiToggle()" />
           <span>Use AI cleanup (GitHub Models)</span>
+        </label>
+        <label class="ai-toggle-label">
+          <input type="checkbox" id="ai-preview-enabled" checked onchange="onAiPreviewToggle()" />
+          <span>Preview before apply</span>
         </label>
         <button class="btn btn-toggle no-print" type="button" onclick="toggleAiSettings()" id="ai-settings-btn" aria-label="AI Settings">AI Settings</button>
         <button class="btn btn-toggle no-print" type="button" onclick="document.getElementById('parse-input').value=''; document.getElementById('parse-result').innerHTML='';" aria-label="Clear">Clear</button>
@@ -416,6 +468,7 @@
       </div>
 
       <div id="parse-result" class="parse-result"></div>
+      </div><!-- /parse-panel-body -->
     </div>
 
     <!-- FOOTING SECTIONS -->
@@ -533,6 +586,7 @@
               <td>
                 <select aria-label="Rebar Size">
                   <option value="">Select Size</option>
+                  <option>#3</option>
                   <option>#4</option>
                   <option>#5</option>
                   <option>#6</option>
@@ -540,6 +594,7 @@
                   <option>#8</option>
                   <option>#9</option>
                   <option>#10</option>
+                  <option>#11</option>
                 </select>
               </td>
             </tr>
@@ -590,6 +645,9 @@
                   <option value="6">#6 (3/4&Prime;)</option>
                   <option value="7">#7 (7/8&Prime;)</option>
                   <option value="8">#8 (1&Prime;)</option>
+                  <option value="9">#9 (1-1/8&Prime;)</option>
+                  <option value="10">#10 (1-1/4&Prime;)</option>
+                  <option value="11">#11 (1-3/8&Prime;)</option>
                 </select>
               </td>
               <td>
@@ -618,6 +676,9 @@
                   <option value="6">#6 (3/4&Prime;)</option>
                   <option value="7">#7 (7/8&Prime;)</option>
                   <option value="8">#8 (1&Prime;)</option>
+                  <option value="9">#9 (1-1/8&Prime;)</option>
+                  <option value="10">#10 (1-1/4&Prime;)</option>
+                  <option value="11">#11 (1-3/8&Prime;)</option>
                 </select>
               </td>
               <td>
@@ -668,6 +729,9 @@
                   <option value="6">#6 (3/4&Prime;)</option>
                   <option value="7">#7 (7/8&Prime;)</option>
                   <option value="8">#8 (1&Prime;)</option>
+                  <option value="9">#9 (1-1/8&Prime;)</option>
+                  <option value="10">#10 (1-1/4&Prime;)</option>
+                  <option value="11">#11 (1-3/8&Prime;)</option>
                 </select>
               </td>
               <td>
@@ -734,6 +798,9 @@
                   <option value="6">#6 (3/4&Prime;)</option>
                   <option value="7">#7 (7/8&Prime;)</option>
                   <option value="8">#8 (1&Prime;)</option>
+                  <option value="9">#9 (1-1/8&Prime;)</option>
+                  <option value="10">#10 (1-1/4&Prime;)</option>
+                  <option value="11">#11 (1-3/8&Prime;)</option>
                 </select>
               </td>
               <td>
@@ -1593,11 +1660,52 @@
       const filled = [];
       const skipped = [];
 
-      const text = raw
+      // Voice-to-text normalization: convert spoken-style phrases to canonical form
+      // so the existing regexes match. Run BEFORE the main pattern matching.
+      function normalizeVoice(s) {
+        let t = s;
+
+        // 1. Number words to digits (1-20, plus a/an)
+        const numberWords = {
+          'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
+          'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
+          'ten': '10', 'eleven': '11', 'twelve': '12', 'thirteen': '13',
+          'fourteen': '14', 'fifteen': '15', 'sixteen': '16', 'seventeen': '17',
+          'eighteen': '18', 'nineteen': '19', 'twenty': '20'
+        };
+        // Replace word-boundary number words. Skip "a" / "an" because they
+        // appear too often as articles ("a box of") to safely substitute.
+        Object.keys(numberWords).forEach(word => {
+          const re = new RegExp('\\b' + word + '\\b', 'gi');
+          t = t.replace(re, numberWords[word]);
+        });
+
+        // 2. "number 4" / "no. 4" / "no 4" -> "#4"  (rebar size phrases)
+        t = t.replace(/\b(?:number|no\.?)\s*(\d+)\b/gi, '#$1');
+
+        // 3. Unit normalization: keep words AND symbols both working.
+        //    Convert "5 feet" -> "5 ft" and "5 inches" -> "5 in" so existing regexes catch them.
+        t = t.replace(/(\d+(?:\.\d+)?)\s*(?:feet|foot)\b/gi, '$1 ft');
+        t = t.replace(/(\d+(?:\.\d+)?)\s*(?:inches|inch)\b/gi, '$1 in');
+
+        // 4. "at one foot spacing" / "at 1 foot" / "at 12 inches" — already handled by above
+
+        // 4. "20 2 by 4 by 16" voice form → "20 2x4x16"
+        // Run twice to handle compound dimensions like "2 by 4 by 16"
+        t = t.replace(/(\d+)\s+by\s+(\d+)/gi, '$1x$2');
+        t = t.replace(/(\d+)\s+by\s+(\d+)/gi, '$1x$2');
+
+        return t;
+      }
+
+      const text = normalizeVoice(raw)
         .replace(/[\u2018\u2019]/g, "'")
         .replace(/[\u201C\u201D]/g, '"')
         .replace(/\s+/g, ' ')
         .trim();
+
+      // Use normalized text for line-by-line work too
+      const normalizedRaw = normalizeVoice(raw);
 
       const setVal = (el, val) => {
         if (!el) return false;
@@ -1652,8 +1760,13 @@
       let lengthFt = null;
       const lfPatterns = [
         /(\d+)\s*(?:total\s+)?lin(?:ear|er)?\s*(?:foot|ft|feet)\s+(?:for|of)\s+(?:the\s+)?house/i,
+        /total\s+of\s+(\d+)\s*lin(?:ear|er)?\s*ft\s+of\s+footers?/i,    // "total of 240 linear ft of footer"
+        /(\d+)\s+lin(?:ear|er)?\s+foot\s+of\s+house/i,                  // "240 linear foot of house"
         /(\d+)\s*(?:total\s+)?lin(?:ear|er)?\s*(?:foot|ft|feet)/i,
-        /^\s*(\d+)\s*ft\s*$/im,
+        /\bhouse\s+(\d+)\s*ft\b/i,                                       // "house 240 ft" (voice)
+        /\bhouse\s+is\s+(\d+)\s*ft\b/i,                                  // "house is 240 ft"
+        /(\d+)\s*ft\s+(?:for|of)\s+(?:the\s+)?house/i,                  // "240 ft for the house"
+        /^\s*(\d+)\s*ft\s*$/im,                                          // bare "240 ft" line
         /house[^.]*?(\d+)\s*ft\b/i
       ];
       for (const p of lfPatterns) {
@@ -1668,13 +1781,42 @@
       }
 
       // ---- CONTINUAL REBAR ----
-      // Match "x3 continual", "x 3 continuous", and common typos like "contiual", "contnual"
-      const continualMatch = text.match(/x\s*(\d+)\s*(?:#\s*(\d+)\s*)?(?:rebar\s+)?(?:cont[a-z]{2,4}al|cont[a-z]{2,4}ous)/i);
+      // Multiple patterns to catch typo variants and word orders:
+      //   "x3 continual", "x 3 contiual", "x3 #5 continuous"
+      //   "x3 #4 bars continual", "3 #5 continual" (no x prefix)
+      //   "continual x3", "x3 #4 longitudinal"
+      const CONTINUAL_TYPOS_RE = /cont[a-z]{1,4}(?:al|ous|uous|uel)|longitudinal/i;
+      const continualPatterns = [
+        // "x3 #4 continual" / "x 3 #5 contiual"
+        new RegExp('x\\s*(\\d+)\\s+(?:#\\s*(\\d+)\\s+)?(?:rebar\\s+|bars?\\s+)?' + CONTINUAL_TYPOS_RE.source, 'i'),
+        // "x3 #4 bars continual"  (rebar word between size and continual)
+        new RegExp('x\\s*(\\d+)\\s+#\\s*(\\d+)\\s+bars?\\s+' + CONTINUAL_TYPOS_RE.source, 'i'),
+        // "3 #5 continual" (no x prefix)
+        new RegExp('(?:^|\\s)(\\d+)\\s+#\\s*(\\d+)\\s+' + CONTINUAL_TYPOS_RE.source, 'i'),
+        // "continual x3" / "continuous x3 #4" (verb-first)
+        new RegExp(CONTINUAL_TYPOS_RE.source + '[^.]*?x\\s*(\\d+)\\s*(?:#\\s*(\\d+))?', 'i')
+      ];
+      let continualMatch = null;
+      for (const re of continualPatterns) {
+        const m = text.match(re);
+        if (m) { continualMatch = m; break; }
+      }
       if (continualMatch) {
         const barCount = continualMatch[1];
         const barSize = continualMatch[2] || '4';
-        const stickMatch = text.match(/(\d+)\s*(?:sticks?\s+)?(?:rebar|#\s*\d+)\s+for\s+the\s+house/i)
-                       || text.match(/(\d+)\s*sticks?\s+#\s*(\d+)/i);
+        const stickPatterns = [
+          /(\d+)\s*(?:sticks?\s+)?(?:rebar|#\s*\d+)\s+for\s+the\s+house/i,
+          /(\d+)\s*sticks?\s+#\s*(\d+)/i,
+          /(\d+)\s+rebar\s+for\s+the\s+house/i,                          // "160 rebar for the house"
+          /(\d+)\s+#\s*\d+\s+sticks?/i,                                  // "160 #4 sticks"
+          /(\d+)\s+(?:total\s+)?sticks?\s+of\s+rebar/i,                  // "160 total sticks of rebar"
+          /(\d+)\s+rebar\s+(?:on)\s+(?:the\s+)?(?:job|footer)/i          // "160 rebar on the job"
+        ];
+        let stickMatch = null;
+        for (const re of stickPatterns) {
+          const m = text.match(re);
+          if (m) { stickMatch = m; break; }
+        }
         const sec1 = document.getElementById('section-1');
         const stdContent = sec1.querySelector('.standard-footing-content');
         if (stickMatch) {
@@ -1718,73 +1860,155 @@
         }
       }
 
-      // ---- CONCRETE: IMI yards ----
-      let totalYards = 0;
-      const yardMatches = [];
-      const yardRegex = /(\d+)\s*yards?\s+(?:of\s+concrete\s+)?(?:from|with)?\s*imi|imi\s+(\d+)\s*yards?/gi;
-      let yardM;
-      while ((yardM = yardRegex.exec(text)) !== null) {
-        const yards = parseInt(yardM[1] || yardM[2], 10);
-        if (yards > 0 && yards < 10000) {
-          yardMatches.push(yards);
-          totalYards += yards;
-        }
-      }
-      if (yardMatches.length > 0) {
-        const yardsInput = document.getElementById('yards-tens');
-        if (setVal(yardsInput, totalYards)) {
-          if (yardMatches.length > 1) {
-            log('Total Yards (IMI)', totalYards + ' (' + yardMatches.join(' + ') + ' across ' + yardMatches.length + ' pours)');
-          } else {
-            log('Yards (IMI)', totalYards);
+      // ---- CONCRETE: IMI / SRM yards ----
+      // Each pour gets attributed to its supplier; total yards = sum.
+      // Dominant supplier (most yards) gets the radio ticked.
+      const concretePours = [];
+      const concretePatterns = [
+        // "129 yards imi", "27 yards srm"
+        { regex: /(\d+)\s*yards?\s+(?:of\s+concrete\s+)?(?:from|with)?\s*imi/gi, co: 'imi' },
+        // "imi 129 yards"
+        { regex: /imi\s+(\d+)\s*yards?/gi, co: 'imi' },
+        // "129 yards srm"
+        { regex: /(\d+)\s*yards?\s+(?:of\s+concrete\s+)?(?:from|with)?\s*srm/gi, co: 'srm' },
+        // "srm 27 yards"
+        { regex: /srm\s+(\d+)\s*yards?/gi, co: 'srm' }
+      ];
+      concretePatterns.forEach(p => {
+        const re = new RegExp(p.regex.source, 'gi');
+        let m;
+        while ((m = re.exec(text)) !== null) {
+          const yards = parseInt(m[1], 10);
+          if (yards > 0 && yards < 10000) {
+            // Dedupe: same pour matched by two patterns at near-same position
+            if (!concretePours.find(pp => Math.abs(pp.pos - m.index) < 30 && pp.yards === yards)) {
+              concretePours.push({ co: p.co, yards, pos: m.index });
+            }
           }
         }
-        setRadio(document.getElementById('imi'));
-        log('Concrete Co.', 'IMI');
+      });
+      concretePours.sort((a, b) => a.pos - b.pos);
+
+      if (concretePours.length > 0) {
+        const totalYards = concretePours.reduce((s, p) => s + p.yards, 0);
+        const yardsInput = document.getElementById('yards-tens');
+        setVal(yardsInput, totalYards);
+
+        // Tick the supplier with the most yards
+        const byCo = {};
+        concretePours.forEach(p => { byCo[p.co] = (byCo[p.co] || 0) + p.yards; });
+        const dominant = Object.entries(byCo).sort((a, b) => b[1] - a[1])[0][0];
+        setRadio(document.getElementById(dominant));
+
+        if (concretePours.length > 1) {
+          const summary = concretePours.map((p, i) =>
+            'Pour ' + (i + 1) + ': ' + p.yards + 'yd ' + p.co.toUpperCase()
+          ).join(', ');
+          log('Concrete', totalYards + 'yd total — ' + summary);
+        } else {
+          log('Concrete', totalYards + 'yd from ' + dominant.toUpperCase());
+        }
       }
 
       // ---- PUMP ----
-      const pumpPatterns = [
-        { regex: /(\d+)\s*(?:m|meter|metre)\s+(?:pump\s+)?(?:from\s+)?brundage/i, co: 'brundage' },
-        { regex: /brundage\s+(\d+)\s*(?:m|meter|metre)/i, co: 'brundage' },
-        { regex: /(\d+)\s*m\s+brundage/i, co: 'brundage' },
-        { regex: /(?:concrete\s+pump\s+partners|cpp)\s+(\d+)\s*(?:m|meter|metre)/i, co: 'cpp' },
-        { regex: /(\d+)\s*(?:m|meter|metre)\s+(?:pump\s+)?(?:from\s+)?(?:concrete\s+pump\s+partners|cpp)/i, co: 'cpp' }
-      ];
+      // Real-world boom pumps span 28–70m typically; smaller line pumps exist too.
+      // Accept 20–80 to be safe; reject anything outside (filters out unrelated numbers).
+      const PUMP_NAMES = {
+        brundage: '(?:brundage(?:\\s+concrete\\s+pumping)?)',
+        cpp:      '(?:concrete\\s+pump\\s+partners|cpp|c\\.p\\.p\\.|concrete\\s+pumping\\s+partners)'
+      };
+      const pumpPatterns = [];
+      for (const [co, nameRe] of Object.entries(PUMP_NAMES)) {
+        pumpPatterns.push(
+          // "53M Brundage pump", "46m cpp"
+          { regex: new RegExp(`(?:^|\\s)(\\d{2})\\s*[mM]?\\s+(?:pump\\s+)?(?:from\\s+)?${nameRe}`, 'i'), co },
+          // "Brundage 46m", "CPP 53m pump", "Brundage 46 meter"
+          { regex: new RegExp(`${nameRe}\\s+(?:pump\\s+)?(\\d{2})\\s*(?:m|meter|metre|M)?\\b`, 'i'), co },
+          // "53 m pump from Brundage", "46m pump cpp"
+          { regex: new RegExp(`(\\d{2})\\s*(?:m|meter|metre|M)\\s+(?:pump\\s+)?(?:from\\s+)?${nameRe}`, 'i'), co },
+          // "Brundage's 53m", "Brundage sent a 46"
+          { regex: new RegExp(`${nameRe}(?:'s|\\s+sent(?:\\s+a)?)\\s+(\\d{2})\\s*[mM]?`, 'i'), co },
+          // "with the 39m pump from Brundage"
+          { regex: new RegExp(`(\\d{2})\\s*[mM]\\s+pump\\s+(?:from\\s+)?${nameRe}`, 'i'), co }
+        );
+      }
       const pumpsFound = [];
       for (const p of pumpPatterns) {
         const m = text.match(p.regex);
-        if (m && !pumpsFound.find(pf => pf.co === p.co)) {
-          pumpsFound.push({ co: p.co, size: m[1] });
+        if (m) {
+          const size = parseInt(m[1], 10);
+          if (size >= 20 && size <= 80) {
+            if (!pumpsFound.find(pf => pf.co === p.co && pf.size === size)) {
+              pumpsFound.push({ co: p.co, size });
+            }
+          }
         }
       }
       if (pumpsFound.length === 1) {
         const p = pumpsFound[0];
-        if (p.co === 'brundage') {
-          setRadio(document.getElementById('pump-brundage'));
-          setVal(document.getElementById('pump-other'), p.size + 'M');
-          log('Pump', 'Brundage ' + p.size + 'M');
-        } else {
-          setRadio(document.getElementById('pump-cpp'));
-          setVal(document.getElementById('pump-other'), p.size + 'M');
-          log('Pump', 'CPP ' + p.size + 'M');
-        }
+        setRadio(document.getElementById('pump-' + p.co));
+        setVal(document.getElementById('pump-other'), p.size + 'M');
+        log('Pump', (p.co === 'brundage' ? 'Brundage' : 'CPP') + ' ' + p.size + 'M');
       } else if (pumpsFound.length > 1) {
         const summary = pumpsFound.map(p => (p.co === 'brundage' ? 'Brundage' : 'CPP') + ' ' + p.size + 'M').join(' + ');
+        setRadio(document.getElementById('pump-' + pumpsFound[0].co));
         setVal(document.getElementById('pump-other'), summary);
-        log('Pumps (multiple)', summary + ' — verify which to tick');
+        log('Pumps (multiple)', summary);
       }
 
       // ---- SUPPLIES ----
-      // Paint
-      const paintM = text.match(/(\d+)\s*(box(?:es)?|cans?|bxs?)\s+(?:of\s+)?paint|paint\s*[:=]?\s*(\d+)\s*(box(?:es)?|cans?|bxs?)/i);
-      if (paintM) {
-        const qty = parseInt(paintM[1] || paintM[3], 10);
-        const unit = (paintM[2] || paintM[4] || '').toLowerCase();
-        const isCan = /can/.test(unit);
-        const labelText = isCan ? 'Paint Cans Quantity' : 'Paint Boxes Quantity';
-        const inp = document.querySelector('input[aria-label="' + labelText + '"]');
-        if (setVal(inp, qty)) log('Paint', qty + ' ' + (isCan ? 'cans' : 'boxes'));
+      // Paint — collect ALL paint quantities, regardless of word order.
+      // Forward order:  "5 cans of paint" / "8 boxes of paint" / "5 cans paint"
+      // Reverse order:  "cans of paint 4" / "boxes of paint 5"
+      // Label-first:    "paint 5 boxes" / "paint cans 4"
+      const paintQuantities = []; // each: { qty, isCan }
+      const paintRegexes = [
+        // qty UNIT (of) paint
+        { re: /(\d+)\s*(box(?:es)?|cans?|bxs?)\s+(?:of\s+)?paint/gi, qtyIdx: 1, unitIdx: 2 },
+        // UNIT (of) paint (and) qty — qty must be terminated cleanly:
+        // followed by comma/period/semicolon/end OR " and " (next conjoined item)
+        // but NOT followed by units that mean it's a dimensional number (ft, in, yards, etc.)
+        { re: /(box(?:es)?|cans?|bxs?)\s+(?:of\s+)?paint\s+(\d+)(?=\s*(?:[,.;]|$|\sand\s))/gi, qtyIdx: 2, unitIdx: 1 },
+        // paint qty UNIT
+        { re: /paint\s*[:=]?\s*(\d+)\s*(box(?:es)?|cans?|bxs?)/gi, qtyIdx: 1, unitIdx: 2 },
+        // paint UNIT qty (must end phrase)
+        { re: /paint\s+(box(?:es)?|cans?|bxs?)\s+(\d+)(?=\s*(?:[,.;]|$|\sand\s))/gi, qtyIdx: 2, unitIdx: 1 }
+      ];
+      const paintSeen = new Set(); // dedupe by exact match string
+      paintRegexes.forEach(({ re, qtyIdx, unitIdx }) => {
+        let m;
+        re.lastIndex = 0;
+        while ((m = re.exec(text)) !== null) {
+          const sig = m[0].toLowerCase().replace(/\s+/g, ' ');
+          if (paintSeen.has(sig)) continue;
+          paintSeen.add(sig);
+          const qty = parseInt(m[qtyIdx], 10);
+          const unit = (m[unitIdx] || '').toLowerCase();
+          if (!isNaN(qty)) {
+            paintQuantities.push({ qty, isCan: /can/.test(unit) });
+          }
+        }
+      });
+      // De-duplicate against overlapping matches: if two entries have same (qty, isCan), keep one
+      const paintFinal = [];
+      const paintKeys = new Set();
+      paintQuantities.forEach(p => {
+        const k = p.qty + '|' + p.isCan;
+        if (!paintKeys.has(k)) { paintKeys.add(k); paintFinal.push(p); }
+      });
+      // Apply: sum quantities of same type
+      let paintBoxesTotal = 0, paintCansTotal = 0;
+      paintFinal.forEach(p => {
+        if (p.isCan) paintCansTotal += p.qty;
+        else paintBoxesTotal += p.qty;
+      });
+      if (paintBoxesTotal > 0) {
+        const inp = document.querySelector('input[aria-label="Paint Boxes Quantity"]');
+        if (setVal(inp, paintBoxesTotal)) log('Paint (boxes)', paintBoxesTotal);
+      }
+      if (paintCansTotal > 0) {
+        const inp = document.querySelector('input[aria-label="Paint Cans Quantity"]');
+        if (setVal(inp, paintCansTotal)) log('Paint (cans)', paintCansTotal);
       }
 
       // Chairs
@@ -1799,6 +2023,117 @@
       if (pinsM) {
         const inp = document.querySelector('input[aria-label="Grade Pins Boxes Quantity"]');
         if (setVal(inp, parseInt(pinsM[1], 10))) log('Grade Pins (boxes)', pinsM[1]);
+      }
+
+      // ---- LUMBER (dimensional + plywood) ----
+      const LUMBER_NOMINAL_DIMS = [4, 6, 8, 10, 12];   // 2x4, 2x6, 2x8, 2x10, 2x12
+      const LUMBER_LENGTHS      = [8, 9, 10, 11, 12, 13, 14, 15, 16];
+      const PLY_THICKNESSES     = ['1/4', '3/8', '1/2', '5/8', '3/4'];
+      const dimLumber = []; // {qty, dim, length}
+      const plywood   = []; // {qty, thickness}
+
+      // Pattern 1: qty + dim + length, e.g. "20 2x4x16", "20 2 x 4 x 16'"
+      const lp1 = /(\d+)\s+2\s*[xX×]\s*(\d+)\s*[xX×]\s*(\d+)\s*'?(?:\s*ft|\s*foot|\s*feet)?/g;
+      let lm;
+      while ((lm = lp1.exec(text)) !== null) {
+        const qty = parseInt(lm[1], 10);
+        const dim = parseInt(lm[2], 10);
+        const length = parseInt(lm[3], 10);
+        if (LUMBER_NOMINAL_DIMS.includes(dim) && LUMBER_LENGTHS.includes(length) && qty > 0 && qty < 1000) {
+          if (!dimLumber.find(r => r.qty === qty && r.dim === dim && r.length === length)) {
+            dimLumber.push({ qty, dim, length });
+          }
+        }
+      }
+
+      // Pattern 2: dim×length followed by qty, e.g. "2x4x16 — 20", "2x4x16: 20", "2x4x16 (20)"
+      // Note: comma is excluded — comma is an item separator, not a qty indicator
+      const lp2 = /2\s*[xX×]\s*(\d+)\s*[xX×]\s*(\d+)\s*'?\s*(?:[—\-:(])\s*(\d+)/g;
+      while ((lm = lp2.exec(text)) !== null) {
+        const dim = parseInt(lm[1], 10);
+        const length = parseInt(lm[2], 10);
+        const qty = parseInt(lm[3], 10);
+        if (LUMBER_NOMINAL_DIMS.includes(dim) && LUMBER_LENGTHS.includes(length) && qty > 0 && qty < 1000) {
+          if (!dimLumber.find(r => r.qty === qty && r.dim === dim && r.length === length)) {
+            dimLumber.push({ qty, dim, length });
+          }
+        }
+      }
+
+      // Pattern 3: "20 sticks of 2x4 at 16'"
+      const lp3 = /(\d+)\s+(?:sticks?|pcs?|pieces?)\s+of\s+2\s*[xX×]\s*(\d+)\s+(?:at\s+)?(\d+)\s*(?:'|ft|foot|feet)/gi;
+      while ((lm = lp3.exec(text)) !== null) {
+        const qty = parseInt(lm[1], 10);
+        const dim = parseInt(lm[2], 10);
+        const length = parseInt(lm[3], 10);
+        if (LUMBER_NOMINAL_DIMS.includes(dim) && LUMBER_LENGTHS.includes(length) && qty > 0 && qty < 1000) {
+          if (!dimLumber.find(r => r.qty === qty && r.dim === dim && r.length === length)) {
+            dimLumber.push({ qty, dim, length });
+          }
+        }
+      }
+
+      // Plywood Pattern 1: "5 sheets of 3/4 plywood"
+      const pp1 = /(\d+)\s+sheets?\s+(?:of\s+)?(1\/4|3\/8|1\/2|5\/8|3\/4)\s*"?\s*(?:in(?:ch)?\s+)?ply(?:wood)?/gi;
+      while ((lm = pp1.exec(text)) !== null) {
+        const qty = parseInt(lm[1], 10);
+        const thickness = lm[2];
+        if (qty > 0 && qty < 500) {
+          if (!plywood.find(r => r.qty === qty && r.thickness === thickness)) {
+            plywood.push({ qty, thickness });
+          }
+        }
+      }
+
+      // Plywood Pattern 2: "3/4 plywood x 5"
+      const pp2 = /(1\/4|3\/8|1\/2|5\/8|3\/4)\s*"?\s*(?:in(?:ch)?\s+)?ply(?:wood)?\s*[xX×:]\s*(\d+)\s*(?:sheets?|pcs?)?/gi;
+      while ((lm = pp2.exec(text)) !== null) {
+        const thickness = lm[1];
+        const qty = parseInt(lm[2], 10);
+        if (qty > 0 && qty < 500) {
+          if (!plywood.find(r => r.qty === qty && r.thickness === thickness)) {
+            plywood.push({ qty, thickness });
+          }
+        }
+      }
+
+      // Apply dimensional lumber: fill 2x4x16 field if present, dump full breakdown to Lumber Notes
+      if (dimLumber.length > 0) {
+        const std2x4x16 = dimLumber.find(l => l.dim === 4 && l.length === 16);
+        if (std2x4x16) {
+          const inp = document.querySelector('input[aria-label="2x4x16 Quantity"]');
+          if (setVal(inp, std2x4x16.qty)) log('2×4×16 Qty', std2x4x16.qty);
+        }
+        const notesTa = document.getElementById('lumber-notes');
+        if (notesTa) {
+          const breakdown = dimLumber.map(l => l.qty + ' — 2x' + l.dim + 'x' + l.length + "'").join('\n');
+          notesTa.value = (notesTa.value ? notesTa.value + '\n' : '') + breakdown;
+          if (dimLumber.length > 1 || !std2x4x16) {
+            const others = dimLumber.filter(l => !(l.dim === 4 && l.length === 16));
+            if (others.length > 0) {
+              const summary = others.map(l => l.qty + ' of 2x' + l.dim + 'x' + l.length + "'").join(', ');
+              log('Lumber (non-2×4×16)', summary + ' — written to Lumber Notes');
+            }
+          }
+        }
+      }
+
+      // Apply plywood: total to dedicated field, breakdown to Lumber Notes if mixed
+      if (plywood.length > 0) {
+        const totalSheets = plywood.reduce((s, p) => s + p.qty, 0);
+        const inp = document.querySelector('input[aria-label="Plywood Sheets Quantity"]');
+        if (setVal(inp, totalSheets)) log('Plywood Sheets', totalSheets);
+        if (plywood.length > 1 || plywood[0].thickness !== '3/4') {
+          const notesTa = document.getElementById('lumber-notes');
+          if (notesTa) {
+            const breakdown = plywood.map(p => p.qty + ' sheets — ' + p.thickness + '" plywood').join('\n');
+            notesTa.value = (notesTa.value ? notesTa.value + '\n' : '') + breakdown;
+          }
+          if (plywood.length > 1) {
+            const summary = plywood.map(p => p.qty + '× ' + p.thickness + '"').join(', ');
+            log('Plywood mix', summary);
+          }
+        }
       }
 
       // ---- EQUIPMENT ----
@@ -1868,8 +2203,132 @@
         /\bl\s+bars?\b/i
       ];
       const hasRW = rwIndicators.some(p => p.test(text));
-      if (hasRW && !document.getElementById('ai-enabled').checked) {
-        skip('Retaining wall content detected. RW sections need dimensions, mat config, cross bars, L bars — too many fields to safely guess. Add a section, tick the Retaining Wall toggle, and fill manually. (Tip: enable AI cleanup to auto-create RW sections.)');
+
+      // ---- DETERMINISTIC RW PARSER ----
+      // Extract structured RW data from voice-style phrasings WITHOUT calling AI.
+      // Each RW chunk is delimited by commas or "retaining wall" markers.
+      const rwSectionsParsed = [];
+      if (hasRW) {
+        // Split into chunks by commas — user is supposed to use commas as separators
+        const chunks = normalizedRaw.split(/[,;]+/).map(c => c.trim()).filter(Boolean);
+        chunks.forEach(chunk => {
+          if (!/retaining\s+wall|\bl\s+bar/i.test(chunk)) return;
+          const rw = parseRwChunk(chunk);
+          if (rw) rwSectionsParsed.push(rw);
+        });
+      }
+
+      function parseRwChunk(chunk) {
+        const c = chunk.toLowerCase();
+        const rw = {};
+
+        // Length: first "N ft" after "retaining wall"
+        const lenM = c.match(/retaining\s+wall[^a-z]*?(\d+(?:\.\d+)?)\s*ft/i);
+        if (lenM) rw.length_ft = parseFloat(lenM[1]);
+
+        // Width: "N ft M in wide" or "N ft wide" or "N in wide" — comes after length
+        // Pattern 1: "4 ft 5 in wide" -> 4*12+5 = 53
+        // Pattern 2: "3 ft 6 in wide" -> 42
+        // Pattern 3: "42 in wide" -> 42
+        // Pattern 4: "4 ft wide" -> 48
+        const widFtInM = c.match(/(\d+)\s*ft\s+(\d+)\s*in\s+wide/);
+        const widFtOnlyM = c.match(/(\d+)\s*ft\s+wide/);
+        const widInOnlyM = c.match(/(\d+)\s*in\s+wide/);
+        if (widFtInM) {
+          rw.width_in = parseInt(widFtInM[1], 10) * 12 + parseInt(widFtInM[2], 10);
+        } else if (widFtOnlyM) {
+          rw.width_in = parseInt(widFtOnlyM[1], 10) * 12;
+        } else if (widInOnlyM) {
+          rw.width_in = parseInt(widInOnlyM[1], 10);
+        }
+
+        // Mat: "double mat", "single mat", "triple mat"
+        if (/\btriple\s+mat\b/.test(c))      rw.mat = 'triple';
+        else if (/\bdouble\s+mat\b/.test(c)) rw.mat = 'double';
+        else if (/\bsingle\s+mat\b/.test(c)) rw.mat = 'single';
+
+        // Pattern "X on X #N" → double mat with X bars per mat of #N
+        const onPattern = c.match(/(\d+)\s+on\s+(\d+)(?:\s+on\s+(\d+))?\s*#?(\d+)/);
+        if (onPattern) {
+          const a = parseInt(onPattern[1], 10);
+          const b = parseInt(onPattern[2], 10);
+          const tri = onPattern[3] ? parseInt(onPattern[3], 10) : null;
+          const sz = parseInt(onPattern[4], 10);
+          rw.horizontal_count_per_mat = a;
+          rw.horizontal_size = sz;
+          if (tri) rw.mat = 'triple';
+          else rw.mat = 'double';
+        }
+
+        // Cross bars: "cross bars #4 at 12 in" or "cross bars number 4 at 1 ft"
+        // Already normalized: "number 4" -> "#4", "1 foot" -> "1 ft"
+        if (/\bcross\s*bars?\b/i.test(c) || /\bcrossbars?\b/i.test(c)) {
+          rw.has_cross_bars = true;
+          // Try to find size near "cross bars"
+          const cbSizeM = c.match(/cross\s*bars?[^.]*?#(\d+)/i) || c.match(/#(\d+)[^.]*?cross\s*bars?/i);
+          if (cbSizeM) rw.crossbar_size = parseInt(cbSizeM[1], 10);
+          // Spacing: "at 12 in" or "at 1 ft" (normalized) or "at one ft"
+          const cbSpaceFtM = c.match(/cross\s*bars?[^.]*?at\s+(\d+)\s*ft\b/i);
+          const cbSpaceInM = c.match(/cross\s*bars?[^.]*?at\s+(\d+)\s*in\b/i);
+          if (cbSpaceInM) rw.crossbar_spacing_in = parseInt(cbSpaceInM[1], 10);
+          else if (cbSpaceFtM) rw.crossbar_spacing_in = parseInt(cbSpaceFtM[1], 10) * 12;
+        } else {
+          rw.has_cross_bars = false;
+        }
+
+        // Uprights: "uprights" or "L bars" with size and spacing
+        if (/\buprights?\b/i.test(c) || /\bl\s*-?\s*bars?\b/i.test(c)) {
+          rw.has_uprights = true;
+          const upSizeM = c.match(/uprights?[^.]*?#(\d+)/i)
+                       || c.match(/l\s*bars?[^.]*?#(\d+)/i)
+                       || c.match(/#(\d+)[^.]*?uprights?/i)
+                       || c.match(/#(\d+)[^.]*?l\s*bars?/i);
+          if (upSizeM) rw.upright_size = parseInt(upSizeM[1], 10);
+          const upSpaceFtM = c.match(/uprights?[^.]*?at\s+(\d+)\s*ft\b/i)
+                          || c.match(/l\s*bars?[^.]*?at\s+(\d+)\s*ft\b/i);
+          const upSpaceInM = c.match(/uprights?[^.]*?at\s+(\d+)\s*in\b/i)
+                          || c.match(/l\s*bars?[^.]*?at\s+(\d+)\s*in\b/i);
+          if (upSpaceInM) rw.upright_spacing_in = parseInt(upSpaceInM[1], 10);
+          else if (upSpaceFtM) rw.upright_spacing_in = parseInt(upSpaceFtM[1], 10) * 12;
+
+          // SHARED spec phrase: "cross bars and uprights #4 at 1 ft" — both share size+spacing
+          // If has_cross_bars but no separate sizing, use the shared one.
+          if (/cross\s*bars?\s+and\s+uprights?/i.test(c) || /uprights?\s+and\s+cross\s*bars?/i.test(c)) {
+            // Find the size and spacing that follows "cross bars and uprights"
+            const sharedM = c.match(/cross\s*bars?\s+and\s+uprights?[^.]*?#(\d+)[^.]*?at\s+(\d+)\s*(ft|in)/i)
+                         || c.match(/uprights?\s+and\s+cross\s*bars?[^.]*?#(\d+)[^.]*?at\s+(\d+)\s*(ft|in)/i);
+            if (sharedM) {
+              const size = parseInt(sharedM[1], 10);
+              const space = sharedM[3] === 'ft' ? parseInt(sharedM[2], 10) * 12 : parseInt(sharedM[2], 10);
+              if (rw.has_cross_bars && !rw.crossbar_size)   rw.crossbar_size = size;
+              if (rw.has_cross_bars && !rw.crossbar_spacing_in) rw.crossbar_spacing_in = space;
+              if (!rw.upright_size)                         rw.upright_size = size;
+              if (!rw.upright_spacing_in)                   rw.upright_spacing_in = space;
+            }
+          }
+        } else {
+          rw.has_uprights = false;
+        }
+
+        // Default mat to single if not specified and only one count given
+        if (!rw.mat && rw.horizontal_count_per_mat) rw.mat = 'single';
+
+        // Need at least length OR width to count this as a real RW
+        if (!rw.length_ft && !rw.width_in) return null;
+
+        rw.label = 'Retaining Wall ' + (rwSectionsParsed.length + 1);
+        return rw;
+      }
+
+      // Apply parsed RW sections directly (no AI needed)
+      if (rwSectionsParsed.length > 0) {
+        const aiOut = { retaining_walls: rwSectionsParsed };
+        const added = applyGeminiOutput(aiOut);
+        added.forEach(a => filled.push(a));
+      }
+
+      if (hasRW && rwSectionsParsed.length === 0 && !document.getElementById('ai-enabled').checked) {
+        skip('Retaining wall content detected but parser could not extract enough info. Add a section, tick the Retaining Wall toggle, and fill manually. (Tip: enable AI cleanup, or use comma-separated phrasing like "retaining wall 50 ft 3 ft 6 in wide, double mat, 4 on 4 #4 cross bars and uprights #4 at 1 ft".)');
       }
 
       // ---- CREW MENTIONS ----
@@ -1925,12 +2384,118 @@
         try {
           const summary = filled.map(f => '- ' + f.field + ': ' + f.value).join('\n') || '(none)';
           const aiOut = await callGemini(raw, summary);
-          const aiAdded = applyGeminiOutput(aiOut);
-          render(aiAdded, null, false);
+
+          // Decide preview vs auto-apply based on toggle
+          const previewOn = document.getElementById('ai-preview-enabled') &&
+                            document.getElementById('ai-preview-enabled').checked;
+
+          if (previewOn) {
+            renderAiPreview(aiOut);
+          } else {
+            const aiAdded = applyGeminiOutput(aiOut);
+            render(aiAdded, null, false);
+          }
         } catch (e) {
           render(null, e.message || String(e), false);
         }
       }
+    }
+
+    // Build a human-readable summary of what the AI proposes
+    function summarizeAiProposal(aiOut) {
+      const lines = [];
+      if (aiOut.additional_notes) lines.push('• Additional Notes: ' + aiOut.additional_notes.slice(0, 120) + (aiOut.additional_notes.length > 120 ? '…' : ''));
+      if (aiOut.section_1_notes) lines.push('• Section 1 Notes: ' + aiOut.section_1_notes.slice(0, 120) + (aiOut.section_1_notes.length > 120 ? '…' : ''));
+      if (aiOut.minix_description) lines.push('• MiniX Description (short): ' + aiOut.minix_description);
+      if (aiOut.hammer_description) lines.push('• Hammer Description (short): ' + aiOut.hammer_description);
+      if (Array.isArray(aiOut.fireplaces)) {
+        aiOut.fireplaces.forEach((fp, i) => {
+          lines.push('• Fireplace ' + (i + 1) + ': ' + (fp.description || ''));
+        });
+      }
+      if (Array.isArray(aiOut.porch_pads)) {
+        aiOut.porch_pads.forEach((pp, i) => {
+          lines.push('• Porch Pad ' + (i + 1) + ': ' + (pp.description || ''));
+        });
+      }
+      if (Array.isArray(aiOut.consumables) && aiOut.consumables.length > 0) {
+        aiOut.consumables.forEach((c, i) => {
+          lines.push('• Consumable: ' + (c.item || '') + (c.qty ? ' qty=' + c.qty : '') + (c.notes ? ' — ' + c.notes : ''));
+        });
+      }
+      if (Array.isArray(aiOut.retaining_walls)) {
+        aiOut.retaining_walls.forEach((rw, i) => {
+          const summary = (rw.length_ft || '?') + 'ft × ' + (rw.width_in || '?') + 'in, '
+            + (rw.mat || '?') + ' mat, '
+            + (rw.horizontal_count_per_mat || '?') + ' x #' + (rw.horizontal_size || '?') + ' horizontal'
+            + (rw.has_cross_bars === false ? ', NO cross bars' : (rw.crossbar_size ? ', #' + rw.crossbar_size + ' cross @ ' + (rw.crossbar_spacing_in || '?') + '"' : ''))
+            + (rw.has_uprights === false ? ', NO uprights' : (rw.upright_size ? ', #' + rw.upright_size + ' uprights @ ' + (rw.upright_spacing_in || '?') + '"' : ''));
+          lines.push('• NEW RW Section: ' + (rw.label || 'Retaining Wall') + ' — ' + summary);
+        });
+      }
+      if (aiOut.crew_notes) lines.push('• Crew: ' + aiOut.crew_notes);
+      return lines.length > 0 ? lines.join('\n') : '(AI returned nothing to apply)';
+    }
+
+    // Render the AI preview panel (does NOT touch the form yet)
+    function renderAiPreview(aiOut) {
+      const resultEl = document.getElementById('parse-result');
+      const summary = summarizeAiProposal(aiOut);
+
+      let preview = document.getElementById('ai-preview-block');
+      if (!preview) {
+        preview = document.createElement('div');
+        preview.id = 'ai-preview-block';
+        preview.className = 'ai-preview';
+        resultEl.appendChild(preview);
+      }
+
+      preview.innerHTML =
+        '<div class="ai-preview-header">🤖 <strong>AI proposal &mdash; edit anything below, delete what you don&rsquo;t want, then Apply</strong></div>' +
+        '<div class="ai-preview-hint">Edit the lines however you want. Delete a line to remove that item. Add new lines if needed. When you click Apply, the AI re-reads your edits and produces the final result.</div>' +
+        '<textarea id="ai-preview-summary-edit" rows="14" spellcheck="false">' + escapeHtml(summary) + '</textarea>' +
+        '<div class="ai-preview-buttons">' +
+          '<button class="btn btn-blue no-print" type="button" onclick="applyAiPreview()" aria-label="Apply AI Proposal">✓ Apply to Form</button>' +
+          '<button class="btn btn-toggle no-print" type="button" onclick="discardAiPreview()" aria-label="Discard">✗ Discard</button>' +
+        '</div>';
+
+      window.__aiPendingProposal = aiOut;
+    }
+
+    // Re-prompts AI with the user's edited summary and asks it to produce
+    // the same JSON schema. Then applies the result.
+    async function applyAiPreview() {
+      const editor = document.getElementById('ai-preview-summary-edit');
+      if (!editor) return;
+      const editedText = editor.value.trim();
+
+      const preview = document.getElementById('ai-preview-block');
+      if (preview) {
+        preview.innerHTML = '<div class="ai-added"><strong>🤖 Re-reading your edits&hellip;</strong></div>';
+      }
+
+      try {
+        const finalJson = await callGeminiReinterpret(editedText);
+        const aiAdded = applyGeminiOutput(finalJson);
+        if (preview) {
+          preview.innerHTML =
+            '<div class="ai-added"><strong>🤖 Applied ' + aiAdded.length + ' item' + (aiAdded.length === 1 ? '' : 's') + ' from edited proposal.</strong> ' +
+            'If anything is still wrong, edit fields directly in the form below.</div>';
+        }
+      } catch (e) {
+        if (preview) {
+          preview.innerHTML = '<div class="skipped"><strong>🤖 Re-interpret failed:</strong> ' + escapeHtml(e.message || String(e)) + '<br>The form was not modified. Try again or edit the form fields directly.</div>';
+        }
+      }
+      window.__aiPendingProposal = null;
+    }
+
+    function discardAiPreview() {
+      const preview = document.getElementById('ai-preview-block');
+      if (preview) {
+        preview.innerHTML = '<div class="skipped">🤖 AI proposal discarded. Form not modified.</div>';
+      }
+      window.__aiPendingProposal = null;
     }
 
     function escapeHtml(s) {
@@ -1944,6 +2509,7 @@
     // ====================================================================
     const GEMINI_KEY_STORAGE = 'k_concrete_form_gemini_key';
     const GEMINI_AI_ENABLED = 'k_concrete_form_ai_enabled';
+    const GEMINI_AI_PREVIEW = 'k_concrete_form_ai_preview';
 
     // Restore saved settings on load
     (function restoreAiSettings() {
@@ -1956,9 +2522,26 @@
         if (aiPref !== null) {
           document.getElementById('ai-enabled').checked = aiPref === '1';
         }
+        const previewPref = localStorage.getItem(GEMINI_AI_PREVIEW);
+        if (previewPref !== null) {
+          document.getElementById('ai-preview-enabled').checked = previewPref === '1';
+        }
         // else: leave the embedded default-checked state alone
       } catch (e) { /* localStorage unavailable */ }
     })();
+
+    function toggleParsePanel() {
+      const body = document.getElementById('parse-panel-body');
+      const btn = document.getElementById('parse-panel-toggle');
+      if (!body || !btn) return;
+      if (body.style.display === 'none') {
+        body.style.display = '';
+        btn.textContent = 'Hide Panel';
+      } else {
+        body.style.display = 'none';
+        btn.textContent = 'Show Panel';
+      }
+    }
 
     function toggleAiSettings() {
       const panel = document.getElementById('ai-settings-panel');
@@ -1994,6 +2577,119 @@
       } catch (e) { /* ignore */ }
     }
 
+    function onAiPreviewToggle() {
+      const on = document.getElementById('ai-preview-enabled').checked;
+      try {
+        localStorage.setItem(GEMINI_AI_PREVIEW, on ? '1' : '0');
+      } catch (e) { /* ignore */ }
+    }
+
+    // Re-prompts GitHub Models with the user's edited summary text. Asks the model
+    // to convert the edited prose back into the same JSON schema. Uses a different
+    // prompt than callGemini — this one assumes structured input from the preview.
+    async function callGeminiReinterpret(editedSummaryText) {
+      const key = (document.getElementById('gemini-key').value || '').trim();
+      if (!key) throw new Error('No GitHub PAT.');
+
+      const prompt =
+        "You produced a JSON proposal earlier. The user reviewed it, found mistakes, and edited the plain-English version. Your one job now: convert the user's edited bullet list back into the same JSON schema. The user's edits override everything you said before. Do not second-guess the user. Do not 're-interpret' their meaning. They wrote what they meant.\n\n" +
+        "============================================================\n" +
+        "USER'S EDITED PROPOSAL — TREAT THIS AS GROUND TRUTH:\n" +
+        "============================================================\n" + editedSummaryText + "\n\n" +
+        "============================================================\n" +
+        "OUTPUT SCHEMA — return STRICT JSON, omit fields not in the edited text:\n" +
+        "============================================================\n" +
+        "{\n" +
+        '  "additional_notes": "string",\n' +
+        '  "section_1_notes": "string",\n' +
+        '  "minix_description": "string (short, 3-6 words)",\n' +
+        '  "hammer_description": "string (short, 3-6 words)",\n' +
+        '  "crew_notes": "string",\n' +
+        '  "fireplaces": [{"description": "string"}],\n' +
+        '  "porch_pads": [{"description": "string"}],\n' +
+        '  "consumables": [{"item": "string", "qty": <number>, "notes": "string"}],\n' +
+        '  "retaining_walls": [{\n' +
+        '    "label": "string",\n' +
+        '    "length_ft": <number>,\n' +
+        '    "width_in": <number, total inches>,\n' +
+        '    "mat": "single" | "double" | "triple",\n' +
+        '    "horizontal_size": <number>,\n' +
+        '    "horizontal_count_per_mat": <number>,\n' +
+        '    "has_cross_bars": <true|false>,\n' +
+        '    "crossbar_size": <number, ONLY IF has_cross_bars is true>,\n' +
+        '    "crossbar_spacing_in": <number, ONLY IF has_cross_bars is true>,\n' +
+        '    "has_uprights": <true|false>,\n' +
+        '    "upright_size": <number, ONLY IF has_uprights is true>,\n' +
+        '    "upright_spacing_in": <number, ONLY IF has_uprights is true>,\n' +
+        '    "upright_length_ft": <number, ONLY IF has_uprights is true>,\n' +
+        '    "bulkheads_qty": <number>,\n' +
+        '    "notes": "string"\n' +
+        '  }]\n' +
+        "}\n\n" +
+        "============================================================\n" +
+        "TRANSLATION RULES — APPLY EXACTLY\n" +
+        "============================================================\n" +
+        "1. DELETED LINE: if the user removed a bullet, that item is GONE. Do not resurrect it. Do not include it.\n" +
+        "2. EDITED VALUE: take the user's value verbatim. If they wrote 'single mat' set mat=single. If they changed 4 to 6 use 6.\n" +
+        "3. ADDED LINE: include it in the right array based on the label prefix (Fireplace 1, Consumable, NEW RW Section, etc.).\n" +
+        "4. RW LINE PARSING: a wall line like '50ft × 42in, double mat, 4 x #4 horizontal, #4 cross @ 12\", #4 uprights @ 12\"' translates to length_ft=50, width_in=42, mat=double, horizontal_size=4, horizontal_count_per_mat=4, has_cross_bars=true, crossbar_size=4, crossbar_spacing_in=12, has_uprights=true, upright_size=4, upright_spacing_in=12.\n" +
+        "5. 'NO cross bars' or 'NO cross' in a wall line: has_cross_bars=false. Do NOT include crossbar_size or crossbar_spacing_in.\n" +
+        "6. 'NO uprights' or 'NO upright' in a wall line: has_uprights=false. Do NOT include upright_size, upright_spacing_in, or upright_length_ft.\n" +
+        "7. '?in' for width means user did not specify — omit width_in entirely.\n" +
+        "8. Width like '3 ft 6 in' or 3'6\" must be converted to total inches (42).\n\n" +
+        "============================================================\n" +
+        "DO NOT:\n" +
+        "============================================================\n" +
+        "• Do not add cross bars the user removed.\n" +
+        "• Do not add uprights the user removed.\n" +
+        "• Do not change the user's mat type.\n" +
+        "• Do not 'fix' anything the user wrote. They are the authority.\n" +
+        "• Do not include any field that does not appear in the user's edited text.\n\n" +
+        "Return ONLY the JSON object. No markdown fences. No preamble. No explanation.";
+
+      const url = 'https://models.github.ai/inference/chat/completions';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'Authorization': 'Bearer ' + key
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.1,
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        let msg = 'GitHub Models error ' + res.status;
+        try {
+          const j = JSON.parse(errText);
+          if (j.error && j.error.message) msg = j.error.message;
+          else if (j.message) msg = j.message;
+        } catch (e) {
+          if (errText && errText.length < 200) msg += ': ' + errText;
+        }
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      const txt = data.choices && data.choices[0]
+        && data.choices[0].message && data.choices[0].message.content;
+      if (!txt) throw new Error('Empty response from re-interpret call.');
+
+      const cleaned = txt.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        throw new Error('Non-JSON output from re-interpret: ' + cleaned.slice(0, 200));
+      }
+    }
+
     async function callGemini(rawNotes, parsedSummary) {
       // Function name kept as callGemini for compatibility, but routes to GitHub Models.
       const key = (document.getElementById('gemini-key').value || '').trim();
@@ -2002,64 +2698,105 @@
       }
 
       const prompt =
-        "You are helping fill out a concrete construction job ticket. Your job is to extract DESCRIPTIVE INFORMATION " +
-        "that the deterministic parser missed. The parser already filled the structured fields (lengths, yards, " +
-        "pumps, supplies, equipment hours). Do NOT re-extract those. Only return content that belongs in NOTES " +
-        "fields or descriptive text fields.\n\n" +
-        "PARSER ALREADY FILLED THESE STRUCTURED FIELDS:\n" + parsedSummary + "\n\n" +
-        "RAW JOB NOTES:\n" + rawNotes + "\n\n" +
-        "Return STRICT JSON with these fields (omit a field if you have nothing for it):\n" +
+        "You are a data extractor for a concrete construction job ticket. Read the raw notes word by word. Do not skim. Do not improvise. Your job is to fill in fields the structured parser missed — no more, no less.\n\n" +
+        "PARSER ALREADY FILLED THESE STRUCTURED FIELDS (do not duplicate):\n" + parsedSummary + "\n\n" +
+        "RAW JOB NOTES (verbatim — read every word):\n" + rawNotes + "\n\n" +
+        "============================================================\n" +
+        "THE CARDINAL RULE: IF THE USER DID NOT WRITE IT, IT DOES NOT EXIST.\n" +
+        "============================================================\n" +
+        "You are not an architect. You are not a builder. You are not 'helping' by adding standard practice. If the user did not say 'cross bars,' there are no cross bars. If the user did not say 'uprights' or 'L bars,' there are no uprights. Do NOT default to common values. Defaults are how you fail.\n\n" +
+        "============================================================\n" +
+        "OUTPUT SCHEMA (return STRICT JSON, omit any field with no info):\n" +
+        "============================================================\n" +
         "{\n" +
-        '  "additional_notes": "general job-wide notes that don\'t fit any specific field. THIS IS WHERE EQUIPMENT DESCRIPTIONS GO — full sentences explaining WHY MiniX/Hammer time was needed, since the small Description input truncates. Format: \'MiniX 8 hrs — clean out safe room pit the builder excavation team messed up, and re-dig for wall guys to put in panels.\' Also: vendors (Whitecap Supply), incident reports (rain delay, survey error), or general project context.",\n' +
-        '  "section_1_notes": "FORMED WORK / SCOPE callouts on the main house section. Examples: large bulkheads formed at various heights, safe room walls formed both sides 100 ft total, steps formed, etc. Use this for structural / formed-in-place work that is part of the scope but does not fit a standard field. Do NOT include rebar counts, equipment hours, or supplies here.",\n' +
-        '  "minix_description": "ULTRA-SHORT (3-6 words) summary for the small Description input box, e.g. \'safe room pit cleanup\'. The full prose belongs in additional_notes.",\n' +
-        '  "hammer_description": "ULTRA-SHORT (3-6 words) summary for the small Description input box, e.g. \'rock in safe room\'. The full prose belongs in additional_notes.",\n' +
-        '  "crew_notes": "any people, names, or hours mentioned that need a crew row",\n' +
-        '  "fireplaces": [\n' +
-        '    {"description": "concise spec like \'8\\\\\' x 5\\\\\', rebar grid each way at 1 ft, 12\\\\\\" depth\'"}\n' +
-        '  ],\n' +
-        '  "porch_pads": [\n' +
-        '    {"description": "concise spec like \'Back porch pad 8\\\\\' x 6\\\\\' x 12\\\\\\" deep, rebar grid each way at 1 ft\'"}\n' +
-        '  ],\n' +
-        '  "consumables": [\n' +
-        '    {"item": "purchased consumable e.g. \'Plastic sheeting\' or \'Cement bags\' or \'Tie wire\'", "qty": <number>, "notes": "details if any"}\n' +
-        '  ],\n' +
-        '  "retaining_walls": [\n' +
-        '    {\n' +
-        '      "label": "short name like \'Back Porch RW\' or \'RW Footer #1\'",\n' +
-        '      "length_ft": <number>,\n' +
-        '      "width_in": <number, the footer width converted to inches; e.g. 3\'6\\" = 42>,\n' +
-        '      "mat": "single" | "double" | "triple",\n' +
-        '      "horizontal_size": <rebar size number, e.g. 4 for #4>,\n' +
-        '      "horizontal_count_per_mat": <number; e.g. \\"4 on 4 #4\\" means 4 per mat>,\n' +
-        '      "crossbar_size": <rebar size number; default 4 if not specified>,\n' +
-        '      "crossbar_spacing_in": <number; \\"at one ft\\" = 12, \\"at 10\\\\\\"\\" = 10>,\n' +
-        '      "has_cross_bars": <true | false; default true. Set false if the wall has only longitudinal bars with no cross/transverse bars mentioned, or if the wall is short/under 4 ft with only continuous bars>,\n' +
-        '      "has_uprights": <true | false; default true. Set false if user says \\"no uprights\\", \\"no L bars\\", or wall is under 4 ft with only continuous bars>,\n' +
-        '      "upright_size": <rebar size number, only if has_uprights is true>,\n' +
-        '      "upright_spacing_in": <number, only if has_uprights is true>,\n' +
-        '      "upright_length_ft": <number, default 4 if not specified>,\n' +
-        '      "bulkheads_qty": <number, omit if not mentioned>,\n' +
-        '      "notes": "anything special: \\"5 ft long L bars bent at 4 ft\\", \\"wall under 4 ft tall, no uprights needed\\""\n' +
-        '    }\n' +
-        '  ]\n' +
+        '  "additional_notes": "long-form context: full sentences for MiniX/Hammer descriptions (since the small Description input truncates), vendor mentions, incident reports, anything explanatory.",\n' +
+        '  "section_1_notes": "FORMED/STRUCTURAL work on the main house: large bulkheads formed at various heights, safe room walls formed both sides, steps formed, etc. Things that are part of scope but do not have their own field.",\n' +
+        '  "minix_description": "3-6 word summary for the small input box.",\n' +
+        '  "hammer_description": "3-6 word summary for the small input box.",\n' +
+        '  "crew_notes": "names, hours, roles mentioned that need a crew row.",\n' +
+        '  "fireplaces": [{"description": "concise spec, e.g. 8 x 5 fireplace, rebar grid each way at 1 ft, 12 inch depth"}],\n' +
+        '  "porch_pads": [{"description": "concise spec"}],\n' +
+        '  "consumables": [{"item": "PURCHASED material only (plastic, cement bags, tie wire, fasteners, sleeves)", "qty": <number>, "notes": "string"}],\n' +
+        '  "retaining_walls": [{\n' +
+        '    "label": "short identifier like Back Porch RW",\n' +
+        '    "length_ft": <number>,\n' +
+        '    "width_in": <number, total inches; 3 ft 6 in = 42>,\n' +
+        '    "mat": "single" | "double" | "triple",\n' +
+        '    "horizontal_size": <rebar number, e.g. 4 for #4>,\n' +
+        '    "horizontal_count_per_mat": <number>,\n' +
+        '    "has_cross_bars": <true|false>,\n' +
+        '    "crossbar_size": <number, ONLY IF has_cross_bars is true>,\n' +
+        '    "crossbar_spacing_in": <number, ONLY IF has_cross_bars is true>,\n' +
+        '    "has_uprights": <true|false>,\n' +
+        '    "upright_size": <number, ONLY IF has_uprights is true>,\n' +
+        '    "upright_spacing_in": <number, ONLY IF has_uprights is true>,\n' +
+        '    "upright_length_ft": <number, ONLY IF has_uprights is true>,\n' +
+        '    "bulkheads_qty": <number>,\n' +
+        '    "notes": "any extra detail mentioned"\n' +
+        '  }]\n' +
         "}\n\n" +
-        "Rules:\n" +
-        "- Be concise. No marketing language. Match the user's blunt tone.\n" +
-        "- DO NOT make up information. If you didn't see it in the notes, omit the field.\n" +
-        "- DO NOT repeat info already in the parser's structured fields.\n" +
-        "- DO NOT put rebar counts, stick counts, yards, hours, supplies, lengths, or pump info into additional_notes or section_1_notes — those are structured data that belong in their own fields.\n" +
-        "- consumables = ONLY purchased materials like plastic sheeting, cement bags, tie wire, fasteners, sleeves. NOT formed structures (bulkheads, fireplaces, safe room walls). NOT rebar (already counted elsewhere). If unsure, do NOT include it.\n" +
-        "- section_1_notes = formed/structural callouts that are part of the job scope. Use plain prose. Examples: large bulkheads formed at various heights, safe room walls formed both sides 100 ft at 18 inches tall, steps formed, etc.\n" +
-        "- additional_notes = full descriptive context. Always include MiniX/Hammer descriptions here as full sentences if they were mentioned. The small Description input truncates, so duplicate the prose here for the record.\n" +
-        "- Fireplaces/porch pads: extract each one separately. Common patterns: '8x5 Fireplace', '6x5 Fireplace', 'Back porch pad 8 x 6 x 12 deep', 'Elevator pad'. Multiple fireplaces or pads beyond the first go in section_1_notes (not consumables).\n" +
-        "- For retaining walls: '4 on 4 #4' means double mat with 4 #4 horizontal bars per mat. '6 on 6 #4' = double mat, 6 #4 per mat. If only one number is given (e.g. 'x3 #4'), that's single mat.\n" +
-        "- Width: footer widths like \"3'6\\\"\" must be converted to total inches (3*12+6=42).\n" +
-        "- If a wall explicitly says no uprights/L-bars (e.g. 'wall under 4 ft, no uprights'), set has_uprights=false.\n" +
-        "- CRITICAL — DO NOT INVENT REBAR SPECS. If the user only mentioned 'x3 #4 bars' for a short wall with NO mention of cross bars, uprights, or L bars, then set has_cross_bars=false AND has_uprights=false. Do not assume there are cross bars at 12 inch spacing or default uprights — those things must be explicitly mentioned by the user.\n" +
-        "- A wall described as 'below 4 ft tall' or 'under 4 ft' with only longitudinal bars (e.g. 'x3 #4 bars only') is a SHORT FOOTER WALL: it has horizontal bars but NO cross bars and NO uprights. In that case set has_cross_bars=false and has_uprights=false.\n" +
-        "- A wall with explicit cross bar AND upright specs ('cross bars at 12, uprights at 12') has both. has_cross_bars=true, has_uprights=true.\n" +
-        "- Return ONLY the JSON object, no markdown fences, no preamble.";
+        "============================================================\n" +
+        "RETAINING WALL DECISION TREE — FOLLOW EXACTLY\n" +
+        "============================================================\n" +
+        "For EACH retaining wall mentioned, before writing JSON, ask yourself:\n\n" +
+        "1. MAT TYPE — count the rebar count statements:\n" +
+        "   • '4 on 4 #4' = double mat, 4 per mat (the 'X on X' pattern means top mat AND bottom mat).\n" +
+        "   • '6 on 6 #4' = double mat, 6 per mat.\n" +
+        "   • '5 on 5 on 5 #4' = triple mat, 5 per mat.\n" +
+        "   • 'x3 #4 bars' or 'just x3 #4' or '3 #4 only' = SINGLE mat, 3 per mat. ONE number = SINGLE.\n\n" +
+        "2. CROSS BARS — did the user write the words 'cross bars' or 'crossbars' or 'transverse'?\n" +
+        "   • YES, with spec: has_cross_bars = true; fill crossbar_size and crossbar_spacing_in from the text.\n" +
+        "   • NO mention: has_cross_bars = FALSE. Do not include crossbar_size or crossbar_spacing_in.\n" +
+        "   • Phrase 'wall under 4 ft' or 'short wall' with only longitudinal bars: has_cross_bars = FALSE.\n\n" +
+        "3. UPRIGHTS / L BARS — did the user write 'uprights', 'L bars', 'L-bars', 'verticals', or 'standers'?\n" +
+        "   • YES, with spec: has_uprights = true; fill upright_size and upright_spacing_in.\n" +
+        "   • NO mention: has_uprights = FALSE. Do not include upright_size or upright_spacing_in.\n" +
+        "   • 'Wall under 4 ft' or 'no uprights' or 'no L bars': has_uprights = FALSE.\n\n" +
+        "============================================================\n" +
+        "WORKED EXAMPLES — STUDY THESE BEFORE WRITING JSON\n" +
+        "============================================================\n\n" +
+        "EXAMPLE A. User wrote: 'Back porch was retaining wall style 50' 3'6\" wide 4 on 4 #4 rebar cross bars and uprights also #4 at one ft spacing'\n" +
+        "Correct output:\n" +
+        '  { "label": "Back Porch RW", "length_ft": 50, "width_in": 42, "mat": "double",\n' +
+        '    "horizontal_size": 4, "horizontal_count_per_mat": 4,\n' +
+        '    "has_cross_bars": true, "crossbar_size": 4, "crossbar_spacing_in": 12,\n' +
+        '    "has_uprights": true, "upright_size": 4, "upright_spacing_in": 12 }\n' +
+        "Why: '4 on 4' = double mat, 4 per mat. User EXPLICITLY said 'cross bars and uprights also #4 at one ft' — so both are present, both #4, both at 12 inches.\n\n" +
+        "EXAMPLE B. User wrote: '125 ' of retaining wall footer, but it only had x 3 #4 bars as the retaining wall heigt was going to be below 4' tall'\n" +
+        "Correct output:\n" +
+        '  { "label": "RW Footer", "length_ft": 125, "mat": "single",\n' +
+        '    "horizontal_size": 4, "horizontal_count_per_mat": 3,\n' +
+        '    "has_cross_bars": false,\n' +
+        '    "has_uprights": false,\n' +
+        '    "notes": "Wall under 4 ft — longitudinal bars only, no cross bars, no uprights" }\n' +
+        "Why: 'x 3 #4 bars' (one number) = single mat, 3 per mat. NO mention of cross bars, NO mention of uprights, AND the user said the wall is below 4 ft. Both has_cross_bars and has_uprights MUST be false. Do NOT include crossbar_size/spacing or upright_size/spacing — those fields do not exist for this wall.\n\n" +
+        "EXAMPLE C. User wrote: '55 ft retaining wall 4'6\" wide 5 on 5 #4 with #5 cross bars at 10\" and #5 L bars 5' long bent at 4'' \n" +
+        "Correct output:\n" +
+        '  { "label": "RW", "length_ft": 55, "width_in": 54, "mat": "double",\n' +
+        '    "horizontal_size": 4, "horizontal_count_per_mat": 5,\n' +
+        '    "has_cross_bars": true, "crossbar_size": 5, "crossbar_spacing_in": 10,\n' +
+        '    "has_uprights": true, "upright_size": 5, "upright_spacing_in": 12, "upright_length_ft": 5,\n' +
+        '    "notes": "L bars 5 ft long, bent at 4 ft" }\n' +
+        "Why: '5 on 5' = double mat, 5 per mat. Cross bars explicitly stated as #5 at 10\". L bars explicitly stated as #5, 5 ft long. 4 ft 6 in = 54 inches.\n\n" +
+        "============================================================\n" +
+        "OTHER ROUTING RULES\n" +
+        "============================================================\n" +
+        "• consumables = ONLY purchased items (plastic, cement bags, tie wire, fasteners, sleeves). NOT formed structures. NOT rebar. NOT lumber (2×4, 2×6, plywood — handled by deterministic parser). If you are not sure, leave it out.\n" +
+        "• section_1_notes = formed work on the main house (bulkheads formed at heights, safe room walls formed). Plain prose, no rebar counts.\n" +
+        "• additional_notes = full prose for equipment descriptions ('MiniX 8 hrs — clean out safe room pit, builders' team messed up, re-dig for wall guys'), vendor mentions (Whitecap Supply), incidents (rain, survey error). Do NOT put rebar counts, supplies, yards, lengths, or pump info here — those go in their own fields.\n" +
+        "• minix_description and hammer_description must be ULTRA-SHORT (3-6 words) for the tiny input box. Full prose belongs in additional_notes.\n" +
+        "• Multiple fireplaces beyond the first go in section_1_notes (not consumables).\n" +
+        "• Footer widths in feet+inches like '3 ft 6 in' or 3'6\" must be converted to total inches (3 ft 6 in = 42).\n\n" +
+        "============================================================\n" +
+        "SELF-CHECK BEFORE RETURNING\n" +
+        "============================================================\n" +
+        "For each retaining wall in your output:\n" +
+        "1. Did the user EXPLICITLY mention cross bars? If no, is has_cross_bars=false? (If you set true without explicit mention, you failed.)\n" +
+        "2. Did the user EXPLICITLY mention uprights or L bars? If no, is has_uprights=false? (Same rule.)\n" +
+        "3. Did you count 'on' words correctly for mat type? (One number = single. Two numbers like 'X on X' = double. Three numbers = triple.)\n" +
+        "4. Did you put any made-up cross bar or upright sizes/spacings? Remove them if so.\n" +
+        "5. Did you accidentally route rebar counts or yards or supplies into a notes field? Move them out.\n\n" +
+        "Return ONLY the JSON object. No markdown fences. No preamble. No explanation.";
 
       const url = 'https://models.github.ai/inference/chat/completions';
 
